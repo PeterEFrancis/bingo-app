@@ -22,6 +22,7 @@
     <style>
       body {
         background-color: white;
+        min-width: 300px;
       }
 
       * {
@@ -59,15 +60,19 @@
         width:10vh;
         height:10vh;
         border: 1px solid #000;
+        max-width: 18vw;
+        max-height: 18vw;
+
       }
+
       .click-square {
         cursor:pointer;
       }
 
 
       .square h2 {
-        margin-top:2vh;
-        font-size: 6vh;
+        margin-top:min(2vh, 3.6vw);
+        font-size: min(6vh, 10.8vw);
       }
 
       .square[value="0"] { background-color:white; color:black}
@@ -81,8 +86,9 @@
 
       .free-space {
         color: white;
-        font-size: 3vh;
-        margin-top: 1vh;
+        font-size: min(3vh, 5.4vw);
+        margin-top: min(1vh, 1.8vw);
+;
       }
 
     </style>
