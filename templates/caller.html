@@ -216,7 +216,7 @@
             <br>
           </div>
           <center><button type="button" class="btn btn-default center-block"
-                  onclick="window.location='/caller'"
+                  onclick="window.location='/caller/p'"
                   style="background-color:red; color:white; margin:10px;">
             <h3 class="text-center">Clear</h3>
           </button></center>
@@ -255,12 +255,11 @@
             alreadyChecked += '_' + i;
           }
         }
-
-        pick = open[Math.floor((Math.random() * (open.length - 1)) + 1)]
-
+        pick = open[Math.floor((Math.random() * (open.length)))]
         window.location = "/caller/p" + alreadyChecked + "_" + pick;
-
       }
+
+
     }
     </script>
   </body>
