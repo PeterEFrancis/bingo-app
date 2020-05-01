@@ -37,11 +37,11 @@ def caller(alreadyChosen):
 @app.route('/card')
 def card():
 
-    B = sorted(r.sample(range(1,16), 5))
-    I = sorted(r.sample(range(16,31), 5))
-    N = sorted(r.sample(range(31,46), 5))
-    G = sorted(r.sample(range(46,61), 5))
-    O = sorted(r.sample(range(61,76), 5))
+    B = r.sample(range(1,16), 5)
+    I = r.sample(range(16,31), 5)
+    N = r.sample(range(31,46), 5)
+    G = r.sample(range(46,61), 5)
+    O = r.sample(range(61,76), 5)
 
     cardArray = np.array([B, I, N, G, O]).T
     cardArray[2][2] = 0

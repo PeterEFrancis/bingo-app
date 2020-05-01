@@ -236,6 +236,17 @@
       }
     }
 
+
+
+  document.body.onkeyup = function(e){
+    if (e.keyCode === 32 || e.key === ' ') {
+        draw();
+    }
+  }
+
+
+
+
     function draw(){
       alreadyCheckedArr = {{ alreadyChosenArray|tojson }};
 

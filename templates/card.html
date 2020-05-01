@@ -29,6 +29,7 @@
         font-family: 'Ubuntu', sans-serif;
         font-size: 16pt;
         color: black;
+        user-select: none;
       }
 
       h1 {
@@ -88,8 +89,8 @@
         color: white;
         font-size: min(3vh, 5.4vw);
         margin-top: min(1vh, 1.8vw);
-;
       }
+
 
     </style>
   </head>
@@ -185,11 +186,12 @@
     }
 
     function toggle(num) {
+      if (num != 0) {
       var square = document.getElementById(num.toString());
       var curr = Number(square.getAttribute("value"));
       square.setAttribute('value',(1-curr).toString());
+      }
     }
-
   </script>
 
 </html>
