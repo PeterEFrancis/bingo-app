@@ -90,12 +90,19 @@
         margin-top: min(1vh, 1.8vw);
       }
 
+
+    @media print {
+      .noprint {display:none;}
+    }
+
     </style>
   </head>
   <body onload="clear_board()">
     <div class="container-fluid">
+      <div class="noprint">
       <a href="/" style="margin:20px; display:inline-block"><span class="glyphicon glyphicon-home"></span></a>
       <a href="/card" style="margin:20px; display:inline-block"><span class="glyphicon glyphicon-refresh"></span></a>
+    </div>
       <div class="row margin">
         <div class="col-md-12">
           <table style="margin:auto">
@@ -123,17 +130,17 @@
         <div class="col-md-6">
           <div class="text-center">
             <div class="btn-group-horizontal">
-              <button type="button" class="btn btn-default center-block"
+              <button type="button" class="btn btn-default center-block noprint"
                       data-toggle="modal" data-target="#clearModal">
                 <h3 class="text-center">Clear</h3>
               </button>
             </div>
           </div>
           <br>
-          <br>
+          <br class="noprint">
           <div class="text-center">
             <p style="display:inline-block" class="text-center">
-              Card link: <a href="/card/{{ cardID }}">{{ cardID }}</a>
+              <strong>Card ID:</strong> {{ cardID }}
             </p>
           </div>
         </div>
@@ -144,7 +151,7 @@
 
 
 
-    <div id="clearModal" class="modal fade" role="dialog">
+    <div id="clearModal" class="modal fade noprint" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
