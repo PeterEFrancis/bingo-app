@@ -39,14 +39,6 @@
       }
 
 
-      .permalink {
-          white-space: pre-wrap; /* CSS3 */
-          white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-          white-space: -pre-wrap; /* Opera 4-6 */
-          white-space: -o-pre-wrap; /* Opera 7 */
-          word-wrap: break-word; /* Internet Explorer 5.5+ */
-      }
-
     </style>
   </head>
   <body>
@@ -110,9 +102,8 @@
                 <h3 class="text-center">Generate!</h3>
               </button>
               <br>
-              <h4>This is your shareable link:</h4>
-              <p class="permalink">
-                <a id="link" href="" target="_blank">&emsp;</a>
+              <p class="">
+                <a id="link" href="" target="_blank"></a>
               </p>
             </form>
           </div>
@@ -184,7 +175,7 @@
       cache: false,
       success: function(response){
         var link = document.getElementById('link');
-        link.innerHTML = response;
+        link.innerHTML = 'This is your shareable link!';
         link.href = response;
       },
       error: function(error){
