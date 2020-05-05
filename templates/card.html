@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link href={{ url_for('static', filename='favicon.ico') }} rel="icon" type="image/x-icon">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
@@ -178,25 +177,11 @@
       return "Are you sure you want to leave? Your clicks will be lost!";
   }
 
-  // function ClipBoard() {
-  //   var copyText = document.getElementById("cardID");
-  //   copyText.select();
-  //   copyText.setSelectionRange(0, 99999)
-  //   document.execCommand("copy");
-  // }
-
   </script>
 
   </body>
 
   <script>
-
-  function ClipBoard() {
-    var copyText = document.getElementById("cardID");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999)
-    document.execCommand("copy");
-  }
 
     function clear_board() {
       card = {{cardArray|tojson}};

@@ -100,9 +100,7 @@ def decode(base_62_num):
 
     return np.array(card, dtype=int).T
 
-
-@app.route('/card')
-def card():
+def get_random_card_id():
 
     B = r.sample(range(1,16), 5)
     I = r.sample(range(16,31), 5)
@@ -115,8 +113,14 @@ def card():
 
     cardID = encode(cardArray)
 
-    return render_template('card.html', cardArray=cardArray.tolist(), cardID= cardID)
+    return cardID
 
+
+
+@app.route('/card')
+def card():
+    return openCardID(get_random_card_id())
+    # return redirect('/card/' + get_random_card_id())
 
 
 @app.route('/card/<string:cardID>')
@@ -125,6 +129,68 @@ def openCardID(cardID):
     cardArray = decode(cardID)
 
     return render_template('card.html', cardArray=cardArray.tolist(), cardID= cardID)
+
+
+
+
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    if request.method == 'POST':
+        name = request.form['name']
+        players = request.form['players'].split("&");
+        number = int(request.form['number'])
+
+        cards = []
+        while len(cards) < len(players) * number:
+            cards += [get_random_card_id()]
+            cards = list(set(cards))
+
+        URL = "https://call-bingo.herokuapp.com/game"
+        URL += "/name=" + name
+        URL += "/players=" + request.form['players']
+        URL += "/cardIDs=" + "&".join(cards)
+        URL += "/number=" + str(number)
+
+        return URL
+
+    return 'Access Denied'
+
+
+
+
+
+@app.route('/game/name=<string:gameName>/players=<string:players>/cardIDs=<string:cardIDs>/number=<int:number>')
+def game(gameName, players, cardIDs, number):
+
+    players = players.split("&")
+    cardIDs = cardIDs.split("&")
+
+    cards = []
+
+    cardDict = {}
+    for player in players:
+        cardDict[player] = [cardIDs.pop() for i in range(number)]
+
+    return render_template("game.html", gameName=gameName, players=players, numbers=range(number), cardDict=cardDict)
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    app.debug = True
+    app.run(port=5000)
+
+
+
+
+
+
+
 
 
 
@@ -161,9 +227,3 @@ def openCardID(cardID):
 #         return jsonify({'standard':str(standard)})
 #
 #     return 'Access Denied'
-
-
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(port=5000)
