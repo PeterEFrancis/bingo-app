@@ -159,7 +159,7 @@
                   {% for col in [0,1,2,3,4] %}
                     <td>
                       {% if row == 2 and col == 2 %}
-                        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" onclick="toggle('{{cardID}}-{{row}}-{{col}}')" value="1">
+                        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" value="1">
                           <h2 class="text-center">
                             <p class="free-space text-center">free<br>space</p>
                           </h2>
@@ -222,12 +222,11 @@
     function clear_board(cardID) {
       for (r = 0; r < 5; r++) {
         for (c = 0; c < 5; c++) {
-          document.getElementById(cardID + "-" + r + "-" + c).setAttribute("value","0");
+          if (r != 2 && c != 2) {
+            document.getElementById(cardID + "-" + r + "-" + c).setAttribute("value","0");
+          }
         }
       }
-      var middleSquare = document.getElementById(cardID + "-2-2");
-      middleSquare.setAttribute("value","1");
-      middleSquare.innerHTML = "<p class='free-space text-center'>free<br>space</p>";
       document.getElementById('confirm-' + cardID).disabled = true;
     }
 
