@@ -123,12 +123,27 @@ def card():
     # return redirect('/card/' + get_random_card_id())
 
 
+
 @app.route('/card/<string:cardID>')
 def openCardID(cardID):
 
     cardArray = decode(cardID)
 
     return render_template('card.html', cardArray=cardArray.tolist(), cardID= cardID)
+
+
+
+
+@app.route('/cards/player=<string:player>/<string:cardIDs>')
+def openCardIDs(player, cardIDs):
+
+    cardIDs = cardIDs.split("&")
+
+    cardArrays = {}
+    for cardID in cardIDs:
+        cardArrays[cardID] = decode(cardID).tolist()
+
+    return render_template('cards.html', player=player, cardArrays = cardArrays, cardIDs = cardIDs)
 
 
 
@@ -150,7 +165,6 @@ def generate():
         URL += "/name=" + name
         URL += "/players=" + request.form['players']
         URL += "/cardIDs=" + "&".join(cards)
-        URL += "/number=" + str(number)
 
         return URL
 
@@ -160,8 +174,8 @@ def generate():
 
 
 
-@app.route('/game/name=<string:gameName>/players=<string:players>/cardIDs=<string:cardIDs>/number=<int:number>')
-def game(gameName, players, cardIDs, number):
+@app.route('/game/name=<string:gameName>/players=<string:players>/cardIDs=<string:cardIDs>')
+def game(gameName, players, cardIDs):
 
     players = players.split("&")
     cardIDs = cardIDs.split("&")
@@ -170,9 +184,9 @@ def game(gameName, players, cardIDs, number):
 
     cardDict = {}
     for player in players:
-        cardDict[player] = [cardIDs.pop() for i in range(number)]
+        cardDict[player] = "&".join([cardIDs.pop() for i in range(int(len(cardIDs)/len(players)))])
 
-    return render_template("game.html", gameName=gameName, players=players, numbers=range(number), cardDict=cardDict)
+    return render_template("game.html", gameName=gameName, cardDict=cardDict)
 
 
 

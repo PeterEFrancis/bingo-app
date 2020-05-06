@@ -57,8 +57,13 @@
 
 
     @media print {
-      .noprint {display:none;}
+      .noprint {
+        display:none;
+      }
     }
+
+
+
     </style>
   </head>
   <body>
@@ -73,21 +78,15 @@
       </div>
       <br>
       <div class="row">
-        {% for player in cardDict %}
-          <div class="col-md-4">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                {{ player }}
-              </div>
-              <div class="panel-body">
-                {% for i in numbers %}
-                  <p>card {{ i + 1}}: <a href="/card/{{ cardDict[player][i] }}" target="_blank">{{ cardDict[player][i] }}</a></p>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-
+        <div class="col-md-4">
+          <ul class="list-group">
+            {% for player in cardDict %}
+              <li class="list-group-item">
+                {{ player }}: <a href="/cards/player={{player}}/{{ cardDict[player] }}" target="_blank">Get Cards</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </div>
 

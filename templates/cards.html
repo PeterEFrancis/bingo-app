@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="utf-8">
+
+    <!-- do not cache this page -->
+    <meta http-equiv="cache-control" content="max-age=0"/>
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <meta http-equiv="expires" content="0"/>
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+
+    <title>
+      Bingo Card
+    </title>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: white;
+        min-width: 300px;
+      }
+
+      * {
+        font-family: 'Ubuntu', sans-serif;
+        font-size: 16pt;
+        color: black;
+      }
+
+      h1 {
+        font-size: 50pt;
+      }
+
+      h3 {
+        font-size: 25pt;
+        margin: 15px 0px 15px;
+      }
+
+      .hide-overflow{
+        overflow: hidden;
+      }
+
+
+      span {
+        font-style: inherit;
+        color: inherit;
+        font-family: inherit;
+        font-size: inherit;
+      }
+
+      .square {
+        width:10vh;
+        height:10vh;
+        border: 1px solid #000;
+        max-width: 18vw;
+        max-height: 18vw;
+        user-select: none;
+      }
+
+      .click-square {
+        cursor: pointer;
+      }
+
+
+      .square h2 {
+        margin-top:min(2vh, 3.6vw);
+        font-size: min(6vh, 10.8vw);
+      }
+
+      .square[value="0"] { background-color:white; color:black}
+      .square[value="1"] { background-color:grey; color:white}
+
+      #B{background-color:red; color:white}
+      #I{background-color:orange; color:white}
+      #N{background-color:green; color:white}
+      #G{background-color:blue; color:white}
+      #O{background-color:purple; color:white}
+
+      .free-space {
+        color: white;
+        font-size: min(3vh, 5.4vw);
+        margin-top: min(1vh, 1.8vw);
+        cursor: auto;
+        background-color: grey;
+      }
+
+      .margin {
+        margin-bottom:150px;
+      }
+
+
+
+
+    @media print {
+      .noprint {
+        display:none;
+      }
+
+      .pagebreak {
+        page-break-after: always;
+      }
+
+      div.print-only-footer {
+        position: fixed;
+        bottom: 0;
+      }
+
+    }
+
+
+
+    @media screen {
+      div.print-only-footer {
+        display: none;
+      }
+      .print {
+        display: none;
+      }
+    }
+
+
+
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="noprint">
+        <a href="/" style="margin:20px; display:inline-block"><span class="glyphicon glyphicon-home"></span></a>
+      </div>
+
+      <div class="row noprint" style="margin-bottom: 50px;">
+        <div class="col-md-12">
+          <h1 class="text-center">Player: {{ player }}</h1>
+        </div>
+      </div>
+
+      {% for cardID in cardIDs %}
+
+        <div class="row margin">
+          <br class="print">
+          <br class="print">
+          <br class="print">
+          <br class="print">
+          <br class="print">
+          <div class="col-md-12">
+            <table style="margin:auto">
+              <tr>
+                <td><div class="square" id="B"><h2 class="text-center">B</h2></div></td>
+                <td><div class="square" id="I"><h2 class="text-center">I</h2></div></td>
+                <td><div class="square" id="N"><h2 class="text-center">N</h2></div></td>
+                <td><div class="square" id="G"><h2 class="text-center">G</h2></div></td>
+                <td><div class="square" id="O"><h2 class="text-center">O</h2></div></td>
+              </tr>
+              {% for row in [0,1,2,3,4] %}
+                <tr>
+                  {% for col in [0,1,2,3,4] %}
+                    <td>
+                      {% if row == 2 and col == 2 %}
+                        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" onclick="toggle('{{cardID}}-{{row}}-{{col}}')" value="1">
+                          <h2 class="text-center">
+                            <p class="free-space text-center">free<br>space</p>
+                          </h2>
+                        </div>
+                      {% else %}
+                        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" onclick="toggle('{{cardID}}-{{row}}-{{col}}')" value="0">
+                          <h2 class="text-center">{{ cardArrays[cardID][row][col] }}</h2>
+                        </div>
+                      {% endif %}
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </table>
+            <br>
+            <p class="text-center"><strong>Card ID:</strong> {{cardID}}</p>
+            <div class="text-center noprint">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary center-block"
+                        onclick="document.getElementById('confirm-{{cardID}}').disabled = false;">
+                  Clear
+                </button>
+                <button type="button" class="btn btn-danger center-block" disabled="true"
+                        id="confirm-{{ cardID }}" onclick="clear_board('{{cardID}}')">
+                  Confirm Clear
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="print-only-footer">
+          <h3>Player: {{ player }}</h3>
+        </div>
+
+        {% if cardID != cardIDs[-1] %}
+          <div class="pagebreak"></div>
+        {% endif %}
+
+      {% endfor %}
+
+    </div>
+
+
+
+
+
+  <script>
+
+  window.onbeforeunload = function () {
+      return "Are you sure you want to leave? Your clicks will be lost!";
+  }
+
+  </script>
+
+  </body>
+
+  <script>
+
+    function clear_board(cardID) {
+      for (r = 0; r < 5; r++) {
+        for (c = 0; c < 5; c++) {
+          document.getElementById(cardID + "-" + r + "-" + c).setAttribute("value","0");
+        }
+      }
+      var middleSquare = document.getElementById(cardID + "-2-2");
+      middleSquare.setAttribute("value","1");
+      middleSquare.innerHTML = "<p class='free-space text-center'>free<br>space</p>";
+      document.getElementById('confirm-' + cardID).disabled = true;
+    }
+
+
+
+    function toggle(ID) {
+      if (ID.substr(ID.length - 4) != '-2-2') {
+      var square = document.getElementById(ID);
+      var curr = Number(square.getAttribute("value"));
+      square.setAttribute('value',(1-curr).toString());
+      }
+    }
+
+  </script>
+
+</html>
