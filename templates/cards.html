@@ -129,13 +129,18 @@
     <div class="container-fluid">
       <div class="noprint">
         <a href="/" style="margin:20px; display:inline-block"><span class="glyphicon glyphicon-home"></span></a>
+        {% if player == "" %}
+        <a href="/card" style="margin:20px; display:inline-block"><span class="glyphicon glyphicon-refresh"></span></a>
+        {% endif %}
       </div>
 
+      {% if player != "" %}
       <div class="row noprint" style="margin-bottom: 50px;">
         <div class="col-md-12">
           <h1 class="text-center">Player: {{ player }}</h1>
         </div>
       </div>
+      {% endif %}
 
       {% for cardID in cardIDs %}
 
@@ -175,7 +180,9 @@
               {% endfor %}
             </table>
             <br>
+            {% if player != "" %}
             <p class="text-center"><strong>Card ID:</strong> {{cardID}}</p>
+            {% endif %}
             <div class="text-center noprint">
               <div class="btn-group" role="group">
                 <button type="button" class="btn btn-primary center-block"
@@ -191,9 +198,11 @@
           </div>
         </div>
 
+        {% if player != "" %}
         <div class="print-only-footer">
           <h3>Player: {{ player }}</h3>
         </div>
+        {% endif %}
 
         {% if cardID != cardIDs[-1] %}
           <div class="pagebreak"></div>
@@ -222,7 +231,7 @@
     function clear_board(cardID) {
       for (r = 0; r < 5; r++) {
         for (c = 0; c < 5; c++) {
-          if (r != 2 && c != 2) {
+          if (r != 2 || c != 2) {
             document.getElementById(cardID + "-" + r + "-" + c).setAttribute("value","0");
           }
         }

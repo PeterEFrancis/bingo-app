@@ -119,17 +119,8 @@ def get_random_card_id():
 
 @app.route('/card')
 def card():
-    return openCardID(get_random_card_id())
+    return openCardIDs("", get_random_card_id())
     # return redirect('/card/' + get_random_card_id())
-
-
-
-@app.route('/card/<string:cardID>')
-def openCardID(cardID):
-
-    cardArray = decode(cardID)
-
-    return render_template('card.html', cardArray=cardArray.tolist(), cardID= cardID)
 
 
 
