@@ -170,12 +170,11 @@ def game(gameName, players, cardIDs):
 
     players = players.split("&")
     cardIDs = cardIDs.split("&")
-
-    cards = []
+    number = int(len(cardIDs)/len(players))
 
     cardDict = {}
     for player in players:
-        cardDict[player] = "&".join([cardIDs.pop() for i in range(int(len(cardIDs)/len(players)))])
+        cardDict[player] = "&".join([cardIDs.pop() for i in range(number)])
 
     return render_template("game.html", gameName=gameName, cardDict=cardDict)
 
@@ -188,7 +187,7 @@ def game(gameName, players, cardIDs):
 
 if __name__ == "__main__":
     app.debug = True
-    app.run(port=5000)
+    app.run()
 
 
 
