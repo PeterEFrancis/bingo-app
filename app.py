@@ -15,8 +15,8 @@ import time
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
-# heroku = Heroku(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
+heroku = Heroku(app)
 
 
 
