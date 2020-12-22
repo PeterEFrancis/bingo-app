@@ -443,22 +443,25 @@
 
 
         function remove_players() {
-          $.ajax({
-            url: '/host_access/remove_players',
-            data: {
-              'code':'{{ code }}',
-              'players':get_checked_players().join(",")
-            },
-            async:true,
-            type: 'POST',
-            cache: false,
-            success: function(response) {
-              update_players();
-            },
-            error: function(error){
-              console.log(error);
-            }
-          });
+          const cps = get_checked_players();
+          if (cps.length != 0) {
+            $.ajax({
+              url: '/host_access/remove_players',
+              data: {
+                'code':'{{ code }}',
+                'players':cps.join(",")
+              },
+              async:true,
+              type: 'POST',
+              cache: false,
+              success: function(response) {
+                update_players();
+              },
+              error: function(error){
+                console.log(error);
+              }
+            });
+          }
         }
 
         update_players();
