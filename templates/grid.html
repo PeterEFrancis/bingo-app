@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col-md-12">
+    <table id="grid" style="margin:auto">
+      <tr id="B-row">
+        <td><div class="square" id="B"><h2 class="text-center">B</h2></div></td>
+      </tr>
+      <tr id="I-row">
+        <td><div class="square" id="I"><h2 class="text-center">I</h2></div></td>
+      </tr>
+      <tr id="N-row">
+        <td><div class="square" id="N"><h2 class="text-center">N</h2></div></td>
+      </tr>
+      <tr id="G-row">
+        <td><div class="square" id="G"><h2 class="text-center">G</h2></div></td>
+      </tr>
+      <tr id="O-row">
+        <td><div class="square" id="O"><h2 class="text-center">O</h2></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  // build board
+  const LETTERS = ["B", "I", "N", "G", "O"];
+  for (var r = 0; r < LETTERS.length; r++) {
+    for (var i = 0; i < 15; i++) {
+      const td = document.createElement('td');
+      const div = document.createElement('div');
+      const h2 = document.createElement('h2');
+      const num = r * 15 + 1 + i;
+      div.classList.add('square');
+      div.setAttribute('id', num);
+      div.setAttribute('value', 0);
+      h2.classList.add('text-center');
+      h2.appendChild(document.createTextNode(num));
+      div.appendChild(h2);
+      td.appendChild(div);
+      td.onclick = function() {flip_square(num);};
+      document.getElementById(LETTERS[r] + '-row').appendChild(td);
+    }
+  }
+</script>

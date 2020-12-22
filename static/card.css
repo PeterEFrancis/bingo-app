@@ -1,0 +1,76 @@
+* {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+h1 {
+  font-size: 50pt;
+}
+
+h3 {
+  font-size: 25pt;
+  margin: 15px 0px 15px;
+}
+
+.square {
+  width:10vh;
+  height:10vh;
+  border: 1px solid #000;
+  max-width: 18vw;
+  max-height: 18vw;
+  user-select: none;
+}
+
+.click-square:hover {
+  cursor: pointer;
+}
+
+.square h2 {
+  margin-top:min(2vh, 3.6vw);
+  font-size: min(6vh, 10.8vw);
+}
+
+.square[value="0"] { background-color:white; color:black}
+.square[value="1"] { background-color:grey; color:white}
+
+#B{background-color:red; color:white}
+#I{background-color:orange; color:white}
+#N{background-color:green; color:white}
+#G{background-color:blue; color:white}
+#O{background-color:purple; color:white}
+
+.free-space {
+  color: white;
+  font-size: min(3vh, 5.4vw);
+  margin-top: min(1vh, 1.8vw);
+  cursor: auto;
+  background-color: grey;
+}
+
+
+
+@media print {
+  .noprint {
+    display:none;
+  }
+
+  .pagebreak {
+    page-break-after: always;
+  }
+
+  div.print-only-footer {
+    position: fixed;
+    bottom: 0;
+  }
+  
+}
+
+
+
+@media screen {
+  div.print-only-footer {
+    display: none;
+  }
+  .print {
+    display: none;
+  }
+}

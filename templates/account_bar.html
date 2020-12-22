@@ -1,0 +1,281 @@
+<div class="row" style="margin-top: 5px;">
+  <div class="col-md-12 text-right">
+    {% if loggedin %}
+       ({{username}}) <button type="button" class="btn btn-danger btn-xs" onclick="logout()">Log Out</button>
+       <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#games-modal">My Games</button>
+    {% else %}
+      <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#login-modal">Log In</button>
+      <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#signup-modal">Sign Up</button>
+    {% endif %}
+    <a href="/"><span class="glyphicon glyphicon-home"></span></a>
+  </div>
+</div>
+
+
+
+<!-- Games Modal -->
+<div id="games-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">My Games</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <tr>
+            <th>Game Join Code</th>
+            <th>Date Created</th>
+            <th>Players</th>
+          </tr>
+        {% for g in games %}
+          <tr>
+            <td><a href="/game/{{g.get_code()}}">{{g.get_code()}}</a></td>
+            <td>{{g.date}}</td>
+            <td id="game-{{g.get_code()}}"></td>
+            <script>
+              document.getElementById('game-{{g.get_code()}}').innerHTML = '{{g.players}}' == '' ? 0 : '{{g.players}}'.split(',').length;
+            </script>
+          </tr>
+        {% endfor %}
+        </table>
+        <br><br>
+        <button class="btn btn-primary" onclick="new_game()">New Game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Login Modal -->
+<div id="login-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Log In</h4>
+      </div>
+      <div class="modal-body">
+        <p>Enter your account login information.</p>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-user"></span>
+          </span>
+          <input id="login-username" class="form-control" placeholder="username"/>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-asterisk"></span>
+          </span>
+          <input id="login-password" type="password" class="form-control" placeholder="password"/>
+        </div>
+        <br>
+        <p id="login-error" style="color:red;">&nbsp;</p>
+        <button class="btn btn-primary center-block" onclick="login()">Log In</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- signup Modal -->
+<div id="signup-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Sign Up</h4>
+      </div>
+      <div class="modal-body">
+        <p>Create your account.</p>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-envelope"></span>
+          </span>
+          <input id="signup-email" class="form-control" placeholder="email"/>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-user"></span>
+          </span>
+          <input id="signup-username" class="form-control" placeholder="username"/>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-asterisk"></span>
+          </span>
+          <input id="signup-password" type="password" class="form-control" placeholder="password"/>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-asterisk"></span>
+          </span>
+          <input id="signup-confirm-password" type="password" class="form-control" placeholder="confirm password"/>
+        </div>
+        <br>
+        <p id="signup-error" style="color:red;">&nbsp;</p>
+        <button class="btn btn-primary center-block" onclick="signup()">Sign Up</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  function emailIsValid (email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  function isAlphaNumeric(str) {
+    var code, i, len;
+
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 91) && // upper alpha (A-Z)
+          !(code > 96 && code < 123)) { // lower alpha (a-z)
+        return false;
+      }
+    }
+    return true;
+  };
+
+
+  function signup() {
+    const email = document.getElementById('signup-email').value;
+    const username = document.getElementById('signup-username').value;
+    const password = document.getElementById('signup-password').value;
+    const confirm_password = document.getElementById('signup-confirm-password').value;
+    if (!emailIsValid(email)) {
+      document.getElementById('signup-error').innerHTML = 'invalid email';
+    } else if (!isAlphaNumeric(username)) {
+      document.getElementById('signup-error').innerHTML = 'username must contain only alphanumeric characters';
+    } else if (password != confirm_password) {
+      document.getElementById('signup-error').innerHTML = 'passwords do not match';
+    } else {
+      document.getElementById('signup-error').innerHTML = '&nbsp;';
+      $.ajax({
+        url: '/signup',
+        data: {
+          'email':email,
+          'username':username,
+          'password':password
+        },
+        type: 'POST',
+        cache: false,
+        success: function(response) {
+          if (response.success == 'true') {
+            login_helper(username, password);
+          } else {
+            document.getElementById('signup-error').innerHTML = response.error;
+          }
+        },
+        error: function(error) {
+          document.getElementById('signup-error').innerHTML = error;
+          console.log(error);
+        },
+      });
+    }
+  }
+
+
+
+
+  function login() {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    login_helper(username, password);
+  }
+
+
+
+
+  function login_helper(username, password) {
+    $.ajax({
+      url: '/login',
+      data: {
+        'username':username,
+        'password':password
+      },
+      type: 'POST',
+      cache: false,
+      success: function(response) {
+        if (response.success == 'true') {
+          location.reload(true);
+        } else {
+          document.getElementById('login-error').innerHTML = response.error;
+        }
+      },
+      error: function(error) {
+        document.getElementById('login-error').innerHTML = error;
+        console.log(error);
+      },
+    });
+  }
+
+
+
+  function logout() {
+    $.ajax({
+      url: '/logout',
+      data: {},
+      type: 'POST',
+      cache: false,
+      success: function(response) {
+        if (response.success == 'true') {
+          window.location.href='/';
+        } else {
+          console.log(response.error);
+        }
+      },
+      error: function(error) {
+        console.log(error);
+      },
+    });
+  }
+
+
+
+
+
+
+  function new_game() {
+    $.ajax({
+      url: '/new_game',
+      data: {},
+      type: 'POST',
+      cache: false,
+      success: function(response) {
+        if (response.success == 'true') {
+          window.location.href = '/game/' + response.code;
+        } else {
+          console.log(response.error);
+        }
+      },
+      error: function(error) {
+        console.log(error);
+      },
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

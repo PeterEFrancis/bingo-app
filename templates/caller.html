@@ -26,23 +26,7 @@
 
       * {
         font-family: 'Ubuntu', sans-serif;
-        font-size: 16pt;
-        color: black;
       }
-
-      h1 {
-        font-size: 50pt;
-      }
-
-      h3 {
-        font-size: 20pt;
-        margin: 15px 0px 15px;
-      }
-
-      .hide-overflow{
-        overflow: hidden;
-      }
-
 
       span {
         font-style: inherit;
@@ -51,7 +35,7 @@
         font-size: inherit;
       }
 
-      .square{
+      .square {
         width:5vw;
         height:5vw;
         border: 1px solid #000;
@@ -60,6 +44,11 @@
       .square h2 {
         margin-top:1vw;
         font-size: 3vw;
+        user-select: none;
+      }
+
+      .clickable:hover {
+        cursor: pointer;
       }
 
       .square[value="0"] { background-color:white; color:black}
@@ -71,256 +60,181 @@
       #G{background-color:blue; color:white}
       #O{background-color:purple; color:white}
 
-
     </style>
+
   </head>
   <body>
+
+    <div class="container">
+      <div class="row" style="margin-top: 5px;">
+        <div class="col-md-12 text-right">
+          <a href="/"><span class="glyphicon glyphicon-home"></span></a>
+        </div>
+      </div>
+    </div>
+
+      <br><br>
+
     <div class="container-fluid">
-      <a href="/" style="margin:20px; display:inline-block"><span class="glyphicon glyphicon-home"></span></a>
-      <div class="row" style="margin-bottom:40px;">
+
+      <!-- Grid -->
+      <div class="row">
         <div class="col-md-12">
-          <table style="margin:auto">
-            <tr>
+          <table id="grid" style="margin:auto">
+            <tr id="B-row">
               <td><div class="square" id="B"><h2 class="text-center">B</h2></div></td>
-              <td><div class="square" id="1" value="0"><h2 class="text-center">1</h2></div></td>
-              <td><div class="square" id="2" value="0"><h2 class="text-center">2</h2></div></td>
-              <td><div class="square" id="3" value="0"><h2 class="text-center">3</h2></div></td>
-              <td><div class="square" id="4" value="0"><h2 class="text-center">4</h2></div></td>
-              <td><div class="square" id="5" value="0"><h2 class="text-center">5</h2></div></td>
-              <td><div class="square" id="6" value="0"><h2 class="text-center">6</h2></div></td>
-              <td><div class="square" id="7" value="0"><h2 class="text-center">7</h2></div></td>
-              <td><div class="square" id="8" value="0"><h2 class="text-center">8</h2></div></td>
-              <td><div class="square" id="9" value="0"><h2 class="text-center">9</h2></div></td>
-              <td><div class="square" id="10" value="0"><h2 class="text-center">10</h2></div></td>
-              <td><div class="square" id="11" value="0"><h2 class="text-center">11</h2></div></td>
-              <td><div class="square" id="12" value="0"><h2 class="text-center">12</h2></div></td>
-              <td><div class="square" id="13" value="0"><h2 class="text-center">13</h2></div></td>
-              <td><div class="square" id="14" value="0"><h2 class="text-center">14</h2></div></td>
-              <td><div class="square" id="15" value="0"><h2 class="text-center">15</h2></div></td>
             </tr>
-            <tr>
+            <tr id="I-row">
               <td><div class="square" id="I"><h2 class="text-center">I</h2></div></td>
-              <td><div class="square" id="16" value="0"><h2 class="text-center">16</h2></div></td>
-              <td><div class="square" id="17" value="0"><h2 class="text-center">17</h2></div></td>
-              <td><div class="square" id="18" value="0"><h2 class="text-center">18</h2></div></td>
-              <td><div class="square" id="19" value="0"><h2 class="text-center">19</h2></div></td>
-              <td><div class="square" id="20" value="0"><h2 class="text-center">20</h2></div></td>
-              <td><div class="square" id="21" value="0"><h2 class="text-center">21</h2></div></td>
-              <td><div class="square" id="22" value="0"><h2 class="text-center">22</h2></div></td>
-              <td><div class="square" id="23" value="0"><h2 class="text-center">23</h2></div></td>
-              <td><div class="square" id="24" value="0"><h2 class="text-center">24</h2></div></td>
-              <td><div class="square" id="25" value="0"><h2 class="text-center">25</h2></div></td>
-              <td><div class="square" id="26" value="0"><h2 class="text-center">26</h2></div></td>
-              <td><div class="square" id="27" value="0"><h2 class="text-center">27</h2></div></td>
-              <td><div class="square" id="28" value="0"><h2 class="text-center">28</h2></div></td>
-              <td><div class="square" id="29" value="0"><h2 class="text-center">29</h2></div></td>
-              <td><div class="square" id="30" value="0"><h2 class="text-center">30</h2></div></td>
             </tr>
-            <tr>
+            <tr id="N-row">
               <td><div class="square" id="N"><h2 class="text-center">N</h2></div></td>
-              <td><div class="square" id="31" value="0"><h2 class="text-center">31</h2></div></td>
-              <td><div class="square" id="32" value="0"><h2 class="text-center">32</h2></div></td>
-              <td><div class="square" id="33" value="0"><h2 class="text-center">33</h2></div></td>
-              <td><div class="square" id="34" value="0"><h2 class="text-center">34</h2></div></td>
-              <td><div class="square" id="35" value="0"><h2 class="text-center">35</h2></div></td>
-              <td><div class="square" id="36" value="0"><h2 class="text-center">36</h2></div></td>
-              <td><div class="square" id="37" value="0"><h2 class="text-center">37</h2></div></td>
-              <td><div class="square" id="38" value="0"><h2 class="text-center">38</h2></div></td>
-              <td><div class="square" id="39" value="0"><h2 class="text-center">39</h2></div></td>
-              <td><div class="square" id="40" value="0"><h2 class="text-center">40</h2></div></td>
-              <td><div class="square" id="41" value="0"><h2 class="text-center">41</h2></div></td>
-              <td><div class="square" id="42" value="0"><h2 class="text-center">42</h2></div></td>
-              <td><div class="square" id="43" value="0"><h2 class="text-center">43</h2></div></td>
-              <td><div class="square" id="44" value="0"><h2 class="text-center">44</h2></div></td>
-              <td><div class="square" id="45" value="0"><h2 class="text-center">45</h2></div></td>
             </tr>
-            <tr>
+            <tr id="G-row">
               <td><div class="square" id="G"><h2 class="text-center">G</h2></div></td>
-              <td><div class="square" id="46" value="0"><h2 class="text-center">46</h2></div></td>
-              <td><div class="square" id="47" value="0"><h2 class="text-center">47</h2></div></td>
-              <td><div class="square" id="48" value="0"><h2 class="text-center">48</h2></div></td>
-              <td><div class="square" id="49" value="0"><h2 class="text-center">49</h2></div></td>
-              <td><div class="square" id="50" value="0"><h2 class="text-center">50</h2></div></td>
-              <td><div class="square" id="51" value="0"><h2 class="text-center">51</h2></div></td>
-              <td><div class="square" id="52" value="0"><h2 class="text-center">52</h2></div></td>
-              <td><div class="square" id="53" value="0"><h2 class="text-center">53</h2></div></td>
-              <td><div class="square" id="54" value="0"><h2 class="text-center">54</h2></div></td>
-              <td><div class="square" id="55" value="0"><h2 class="text-center">55</h2></div></td>
-              <td><div class="square" id="56" value="0"><h2 class="text-center">56</h2></div></td>
-              <td><div class="square" id="57" value="0"><h2 class="text-center">57</h2></div></td>
-              <td><div class="square" id="58" value="0"><h2 class="text-center">58</h2></div></td>
-              <td><div class="square" id="59" value="0"><h2 class="text-center">59</h2></div></td>
-              <td><div class="square" id="60" value="0"><h2 class="text-center">60</h2></div></td>
             </tr>
-            <tr>
+            <tr id="O-row">
               <td><div class="square" id="O"><h2 class="text-center">O</h2></div></td>
-              <td><div class="square" id="61" value="0"><h2 class="text-center">61</h2></div></td>
-              <td><div class="square" id="62" value="0"><h2 class="text-center">62</h2></div></td>
-              <td><div class="square" id="63" value="0"><h2 class="text-center">63</h2></div></td>
-              <td><div class="square" id="64" value="0"><h2 class="text-center">64</h2></div></td>
-              <td><div class="square" id="65" value="0"><h2 class="text-center">65</h2></div></td>
-              <td><div class="square" id="66" value="0"><h2 class="text-center">66</h2></div></td>
-              <td><div class="square" id="67" value="0"><h2 class="text-center">67</h2></div></td>
-              <td><div class="square" id="68" value="0"><h2 class="text-center">68</h2></div></td>
-              <td><div class="square" id="69" value="0"><h2 class="text-center">69</h2></div></td>
-              <td><div class="square" id="70" value="0"><h2 class="text-center">70</h2></div></td>
-              <td><div class="square" id="71" value="0"><h2 class="text-center">71</h2></div></td>
-              <td><div class="square" id="72" value="0"><h2 class="text-center">72</h2></div></td>
-              <td><div class="square" id="73" value="0"><h2 class="text-center">73</h2></div></td>
-              <td><div class="square" id="74" value="0"><h2 class="text-center">74</h2></div></td>
-              <td><div class="square" id="75" value="0"><h2 class="text-center">75</h2></div></td>
             </tr>
           </table>
+          <script>
+            // build board
+            const LETTERS = ["B", "I", "N", "G", "O"];
+            for (var r = 0; r < LETTERS.length; r++) {
+              for (var i = 0; i < 15; i++) {
+                const td = document.createElement('td');
+                const div = document.createElement('div');
+                const h2 = document.createElement('h2');
+                const num = r * 15 + 1 + i;
+                div.classList.add('square');
+                {% if mode != 'player' %}
+                div.classList.add('clickable');
+                {% endif %}
+                div.setAttribute('id', num);
+                div.setAttribute('value', 0);
+                h2.classList.add('text-center');
+                h2.appendChild(document.createTextNode(num));
+                div.appendChild(h2);
+                td.appendChild(div);
+                {% if mode != 'player' %}
+                  td.onclick = function() {flip_square(num);};
+                {% endif %}
+                document.getElementById(LETTERS[r] + '-row').appendChild(td);
+              }
+            }
+          </script>
         </div>
       </div>
-      <div class="row margin">
-        <div class="col-md-3">
+
+      <div class="row">
+        <div class="col-md-12">
+          <h1 id="last" style="font-size:100pt" class="text-center">&nbsp;</h1>
         </div>
-        <div class="col-md-6">
-          <div class="text-center">
-            <div class="btn-group text-center">
-              <button type="button" class="btn btn-default"
-                      onclick="draw()">
-                <h3 class="text-center">Draw</h3>
-              </button>
-              <button type="button" class="btn btn-default"
-                      data-toggle="modal" data-target="#clearModal">
-                <h3 class="text-center">Clear</h3>
-              </button>
-              <!-- <button type="button" class="btn btn-default"
-                      data-toggle="modal" data-target="#checkModal">
-                <h3 class="text-center">Check</h3>
-              </button> -->
+      </div>
+
+      <!-- buttons -->
+      <div class="row">
+        <div class="col-sm-3"></div>
+        <!-- draw -->
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-default btn-lg btn-block" id="draw" onclick="draw()">
+              Draw
+          </button>
+        </div>
+        <!-- clear -->
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#clearModal">
+            Clear
+          </button>
+        </div>
+        <div class="col-sm-3"></div>
+      </div>
+
+
+      <div id="clearModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Clear Confirmation</h4>
             </div>
-          </div>
-          <br>
-          <h1 style="font-size:100pt" class="text-center">{{square}}</h1>
-        </div>
-        <div class="col-md-3">
-        </div>
-      </div>
-    </div>
-
-
-
-
-    <div id="clearModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Clear Confirmation</h4>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to clear?
+            <div class="modal-body">
+              Are you sure you want to clear?
+              <br>
+            </div>
+            <center>
+              <button type="button" class="btn btn-danger center-block btn-lg" onclick="clear_board(); $('#clearModal').modal('hide')">
+                Clear
+              </button>
+            </center>
             <br>
           </div>
-          <center><button type="button" class="btn btn-default center-block"
-                  onclick="window.location='/caller/p'"
-                  style="background-color:red; color:white; margin:10px;">
-            <h3 class="text-center">Clear</h3>
-          </button></center>
         </div>
       </div>
-    </div>
-
-    <div id="checkModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Check Card ID</h4>
-          </div>
-          <div class="modal-body">
-            <div class="form-group text-center">
-              <label>
-                <input type="text" class="form-control" id="cardID">
-              </label>
-              <button onclick="check()" class="btn btn-default">Check Card ID</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
 
-  <script>
-
-
-    //
-    // function check() {
-    //   var alreadyChosenNumpy = {{alreadyChosenArray|tojson}};
-    //   cardID = document.getElementById('cardID').value;
-    //
-    //   if (cardID != "" && alreadyChosenNumpy.length != 0) {
-    //
-    //     var alreadyChosenStr = "" + alreadyChosenNumpy[0];
-    //     for (i = 1; i < alreadyChosenNumpy.length; i++) {
-    //       alreadyChosenStr = alreadyChosenStr + "&" + alreadyChosenNumpy[i];
-    //     }
-    //
-    //     $.ajax({
-    //       url: '/check',
-    //       data: {alreadyChosenStr: alreadyChosenStr, cardID: cardID},
-    //       type: 'POST',
-    //       cache: false,
-    //       success: function(response){
-    //         console.log(response);
-    //       },
-    //       error: function(error){
-    //         document.getElementById('create_error').innerHTML = "error";
-    //         console.log(error);
-    //       },
-    //     });
-    //   }
-    // }
-    //
-
-
-
-
-    for (i = 1; i <= 75; i++){
-      if ({{ alreadyChosenArray|tojson }} != []){
-        if ({{ alreadyChosenArray|tojson }}.includes(i)){
-          document.getElementById(i.toString()).setAttribute("value","1");
+      <!-- set up board variables -->
+      <script>
+        var board = [];
+        var left = [];
+        var board1 = '0';
+        for (var i = 0; i < 74; i++) {
+          board1 += '0';
         }
-      }
-    }
+        board2 = board1.split('');
+        for (var i = 0; i < 75; i++) {
+          board.push(Number(board2[i]));
+          left.push(i + 1);
+        }
+      </script>
+
+      <!-- Draw and clear actions -->
+      <script>
+        function flip_square(num) {
+          num = Number(num);
+          board[num - 1] = String(1 - Number(board[num - 1]));
+          if (board[num - 1] == '1') {
+            // console.log("BINGO"[Math.floor((num - 1) / 15)] + ' ' + num);
+            document.getElementById('last').innerHTML = "BINGO"[Math.floor((num - 1) / 15)] + ' ' + num;
+          } else {
+            document.getElementById('last').innerHTML = "&nbsp;";
+          }
+          left = left.filter(function(ele){
+              return ele != num;
+          });
+          document.getElementById(num).setAttribute('value',1 - Number(document.getElementById(num).getAttribute('value')));
+        }
 
 
-
-  document.body.onkeyup = function(e){
-    if (e.keyCode === 32 || e.key === ' ') {
-        draw();
-    }
-  }
-
-
-
-
-    function draw(){
-      alreadyCheckedArr = {{ alreadyChosenArray|tojson }};
-
-      if (alreadyCheckedArr.length != 75) {
-        open = [];
-        for (i = 1; i <= 75; i++) {
-          if (!alreadyCheckedArr.includes(i)) {
-            open.push(i);
+        document.body.onkeyup = function(e){
+          if (left.length != 0 && e.keyCode === 68) {
+              draw();
           }
         }
 
-        alreadyChecked = '';
-        for (i = 1; i <= 75; i++){
-          if (alreadyCheckedArr.includes(i)){
-            alreadyChecked += '_' + i;
+
+        function draw() {
+          flip_square(left[Math.floor(Math.random() * left.length)]);
+          document.getElementById('draw').disabled = left.length == 0;
+        }
+
+        function clear_board() {
+          board = [];
+          left = [];
+          document.getElementById('draw').disabled = false;
+          document.getElementById('last').innerHTML = "&nbsp;";
+          for (var i = 0; i < 75; i++) {
+            board.push(0);
+            left.push(i + 1);
+            document.getElementById(i + 1).setAttribute('value',0);
           }
         }
-        pick = open[Math.floor((Math.random() * (open.length)))]
-        window.location = "/caller/p" + alreadyChecked + "_" + pick;
-      }
+
+      </script>
 
 
-    }
-    </script>
+    </div>
+
+
   </body>
 </html>
