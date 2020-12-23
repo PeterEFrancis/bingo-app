@@ -528,7 +528,7 @@
             data: {
               'code':'{{ code }}',
               'num_cards':document.getElementById('num-cards').value,
-              'players':cps
+              'players':cps.join(',')
             },
             type: 'POST',
             cache: false,
