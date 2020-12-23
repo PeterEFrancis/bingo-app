@@ -111,7 +111,7 @@
                 div.classList.add('clickable');
                 {% endif %}
                 div.setAttribute('id', num);
-                div.setAttribute('value', 0);
+                div.setAttribute('light', 0);
                 h2.classList.add('text-center');
                 h2.appendChild(document.createTextNode(num));
                 div.appendChild(h2);
@@ -202,7 +202,7 @@
           left = left.filter(function(ele){
               return ele != num;
           });
-          document.getElementById(num).setAttribute('value',1 - Number(document.getElementById(num).getAttribute('value')));
+          document.getElementById(num).setAttribute('light',1 - Number(document.getElementById(num).getAttribute('light')));
         }
 
 
@@ -226,7 +226,7 @@
           for (var i = 0; i < 75; i++) {
             board.push(0);
             left.push(i + 1);
-            document.getElementById(i + 1).setAttribute('value',0);
+            document.getElementById(i + 1).setAttribute('light',0);
           }
         }
 
