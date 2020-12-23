@@ -92,16 +92,39 @@
             </div>
             <div class="modal-body">
               Players can join at
-              <input class="form-control" value="/join/{{code}}" style="margin-top:10px;"
-                     onclick="this.select();" readonly></input>
+              <div class="input-group" style="margin-top:10px;">
+                <input id="join-link" class="form-control" value="/join/{{code}}" onclick="this.select();" readonly></input>
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" onclick="copy_link('join-link')">
+                    <span class="glyphicon glyphicon-copy"></span>
+                  </button>
+                </span>
+              </div>
+
               <br>
               Players can watch the board at
-              <input class="form-control"  value="/game/{{code}}" style="margin-top:10px;"
-                     onclick="this.select();" readonly></input>
+              <div class="input-group" style="margin-top:10px;">
+                <input id="game-link" class="form-control" value="/game/{{code}}" onclick="this.select();" readonly></input>
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" onclick="copy_link('game-link')">
+                    <span class="glyphicon glyphicon-copy"></span>
+                  </button>
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <script>
+        document.getElementById('join-link').value = window.location.origin + "/join/{{code}}";
+        document.getElementById('game-link').value = window.location.href;
+
+        function copy_link(id) {
+          document.getElementById(id).select();
+          document.execCommand("copy");
+        }
+      </script>
 
     </div>
 
@@ -499,23 +522,24 @@
 
       function deal() {
         const cps = get_checked_players();
-        var players = get_checked_players(cps.length == 0).join(",");
-        $.ajax({
-          url: '/host_access/deal',
-          data: {
-            'code':'{{ code }}',
-            'num_cards':document.getElementById('num-cards').value,
-            'players':players
-          },
-          type: 'POST',
-          cache: false,
-          success: function(response) {
-            update_players();
-          },
-          error: function(error){
-            console.log(error);
-          }
-        });
+        if (cps.length != 0) {
+          $.ajax({
+            url: '/host_access/deal',
+            data: {
+              'code':'{{ code }}',
+              'num_cards':document.getElementById('num-cards').value,
+              'players':cps
+            },
+            type: 'POST',
+            cache: false,
+            success: function(response) {
+              update_players();
+            },
+            error: function(error){
+              console.log(error);
+            }
+          });
+        }
       }
 
       function check_for_bingo() {
@@ -570,7 +594,6 @@
       setInterval(update_players,2000);
 
     </script>
-
 
     {% endif %}
 

@@ -14,13 +14,13 @@
       {% for col in [0,1,2,3,4] %}
       <td>
         {% if row == 2 and col == 2 %}
-        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" value="1">
+        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" light="1">
           <h2 class="text-center">
             <p class="free-space text-center">free<br>space</p>
           </h2>
         </div>
         {% else %}
-        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" onclick="this.setAttribute('value',1 - Number(this.getAttribute('value')))" value="0">
+        <div id="{{cardID}}-{{row}}-{{col}}" class="square click-square" onclick="this.setAttribute('light',1 - Number(this.getAttribute('light')))" value="0">
           <h2 class="text-center">{{ cardArray[row][col] }}</h2>
         </div>
         {% endif %}
@@ -38,7 +38,7 @@
       Clear
     </button>
     <button id="confirm-{{ cardID }}" type="button" class="btn btn-danger btn-sm" disabled="true"
-            onclick="for(r=0;r<5;r++){for(c=0;c<5;c++){if(r!=2||c!=2){document.getElementById('{{cardID}}-'+r+'-'+c).setAttribute('value','0');}}}this.disabled=true;">
+            onclick="for(r=0;r<5;r++){for(c=0;c<5;c++){if(r!=2||c!=2){document.getElementById('{{cardID}}-'+r+'-'+c).setAttribute('light','0');}}}this.disabled=true;">
       Confirm Clear
     </button>
   </div>
