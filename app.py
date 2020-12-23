@@ -77,10 +77,10 @@ class Game(db.Model):
         self.players = str(pdict)
         db.session.commit()
 
-    def deal(self, num_cards):
+    def deal(self, num_cards, players):
         pdict = eval(self.players)
-        cardIDs = get_n_cards(len(pdict) * num_cards)
-        for i, player in enumerate(pdict):
+        cardIDs = get_n_cards(len(players) * num_cards)
+        for i, player in enumerate(players):
             pdict[player] = cardIDs[i * num_cards : (i + 1) * num_cards]
         self.players = str(pdict)
         db.session.commit()
@@ -140,7 +140,11 @@ def host_access(function):
         game.clear_board()
         return jsonify({'success':'true'})
     elif function == "get_players":
-        return jsonify(eval(game.players))
+        pdict_old = eval(game.players)
+        pdict = {}
+        for player in pdict_old:
+            pdict[player] = [[cardID, decode(cardID).tolist()] for cardID in pdict_old[player]]
+        return jsonify({'success':'true', 'player_dict':pdict, 'board':game.board, 'last':game.last})
     elif function == "remove_players":
         for p in request.form['players'].split(","):
             game.remove_player(p)
@@ -157,7 +161,7 @@ def host_access(function):
                     bingo_dict[p].append([cardID, check])
         return jsonify({'success':'true', 'bingo_dict': bingo_dict})
     elif function == "deal":
-        game.deal(int(request.form['num_cards']))
+        game.deal(int(request.form['num_cards']), request.form['players'].split(','))
         return jsonify({'success':'true'})
     else:
         return 'Access Denied.',404
@@ -548,6 +552,8 @@ def join_free():
 @app.route('/join/<string:code>')
 def join(code):
     if is_game(code) or code == "":
+        if 'player-' + code in session:
+            return redirect('/play/' + code)
         return render_template(
             'join.html',
             account_bar = get_account_bar(),
@@ -567,7 +573,7 @@ def join_game():
     game = get_game(request.form['code'])[0]
     if game.has_player(request.form['player']):
         return jsonify({'success':'false', 'error':'This username is already in use. Try another!'})
-    session['player'] = request.form['player']
+    session['player-' + request.form['code']] = request.form['player']
     game.add_player(request.form['player'])
     return jsonify({'success':'true', 'code':game.get_code()})
 
@@ -578,14 +584,14 @@ def play(code):
     if not is_game(code):
         return jsonify({'success':'false', 'error':'No game found.'})
     game = get_game(code)[0]
-    if 'player' not in session:
+    if 'player-' + code not in session:
         return redirect('/join/' + code)
-    if game.has_player(session['player']):
-        cardIDs = eval(game.players)[session['player']]
+    if game.has_player(session['player-' + code]):
+        cardIDs = eval(game.players)[session['player-' + code]]
         return render_template(
             'cards.html',
             mode='player',
-            player=session['player'],
+            player=session['player-' + code],
             num=len(cardIDs),
             cardHTML=get_cardHTML(cardIDs)
         )

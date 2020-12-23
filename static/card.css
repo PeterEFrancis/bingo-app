@@ -29,8 +29,8 @@ h3 {
   font-size: min(6vh, 10.8vw);
 }
 
-.square[value="0"] { background-color:white; color:black}
-.square[value="1"] { background-color:grey; color:white}
+*[light="0"] { background-color:white; color:black}
+*[light="1"] { background-color:grey; color:white}
 
 #B{background-color:red; color:white}
 #I{background-color:orange; color:white}
@@ -61,7 +61,7 @@ h3 {
     position: fixed;
     bottom: 0;
   }
-  
+
 }
 
 

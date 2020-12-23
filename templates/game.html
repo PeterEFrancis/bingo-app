@@ -21,20 +21,13 @@
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
     <style>
       body {
+        min-width: 300px;
         background-color: white;
       }
 
       * {
         font-family: 'Ubuntu', sans-serif;
       }
-
-      span {
-        font-style: inherit;
-        color: inherit;
-        font-family: inherit;
-        font-size: inherit;
-      }
-
       .square {
         width:5vw;
         height:5vw;
@@ -51,22 +44,27 @@
         cursor: pointer;
       }
 
-      .square[value="0"] { background-color:white; color:black}
-      .square[value="1"] { background-color:grey; color:white}
+      *[light="0"] { background-color:white; color:black}
+      *[light="1"] { background-color:grey; color:white}
 
-      #B{background-color:red; color:white}
-      #I{background-color:orange; color:white}
-      #N{background-color:green; color:white}
-      #G{background-color:blue; color:white}
-      #O{background-color:purple; color:white}
+      .B{background-color:red; color:white}
+      .I{background-color:orange; color:white}
+      .N{background-color:green; color:white}
+      .G{background-color:blue; color:white}
+      .O{background-color:purple; color:white}
 
       br {
         user-select: none;
       }
 
+      .badge:hover {
+        cursor: pointer;
+      }
+
     </style>
   </head>
   <body>
+
     <div class="container">
 
       <!-- account bar -->
@@ -105,28 +103,28 @@
         </div>
       </div>
 
-
     </div>
 
     <div class="container-fluid">
+
       <!-- Grid -->
       <div class="row">
         <div class="col-md-12">
           <table id="grid" style="margin:auto">
             <tr id="B-row">
-              <td><div class="square" id="B"><h2 class="text-center">B</h2></div></td>
+              <td><div class="square B"><h2 class="text-center">B</h2></div></td>
             </tr>
             <tr id="I-row">
-              <td><div class="square" id="I"><h2 class="text-center">I</h2></div></td>
+              <td><div class="square I"><h2 class="text-center">I</h2></div></td>
             </tr>
             <tr id="N-row">
-              <td><div class="square" id="N"><h2 class="text-center">N</h2></div></td>
+              <td><div class="square N"><h2 class="text-center">N</h2></div></td>
             </tr>
             <tr id="G-row">
-              <td><div class="square" id="G"><h2 class="text-center">G</h2></div></td>
+              <td><div class="square G"><h2 class="text-center">G</h2></div></td>
             </tr>
             <tr id="O-row">
-              <td><div class="square" id="O"><h2 class="text-center">O</h2></div></td>
+              <td><div class="square O"><h2 class="text-center">O</h2></div></td>
             </tr>
           </table>
           <script>
@@ -143,7 +141,7 @@
                 div.classList.add('clickable');
                 {% endif %}
                 div.setAttribute('id', num);
-                div.setAttribute('value', 0);
+                div.setAttribute('light', 0);
                 h2.classList.add('text-center');
                 h2.appendChild(document.createTextNode(num));
                 div.appendChild(h2);
@@ -157,19 +155,20 @@
           </script>
         </div>
       </div>
+
+      <!-- last -->
+      <div class="row">
+        <div class="col-md-12">
+          <h1 id="last" style="font-size:100pt" class="text-center">&nbsp;</h1>
+        </div>
+      </div>
+
     </div>
 
-    <div class="row">
-      <div class="col-md-12">
-        <h1 id="last" style="font-size:100pt" class="text-center">&nbsp;</h1>
-      </div>
-    </div>
+    {% if mode == "host" %}
 
     <div class="container">
-
-      {% if mode == "host" %}
-      <br>
-      <!-- buttons -->
+      <!-- board buttons -->
       <div class="row">
         <div class="col-sm-3"></div>
         <!-- draw -->
@@ -209,30 +208,35 @@
       <!-- Player info -->
       <br><br><br>
       <div class="row">
-        <div class="col-sm-12">
-          <br>
-          <div class="input-group" style="width: 150px; margin-left: auto">
+        <div class="col-sm-12 text-right" style="margin-bottom:-26.5px">
+          <div class="input-group" style="width: 150px; display: inline-table;">
             <input id="num-cards" class="form-control" placeholder="Number of Cards" type="number" value="1"/>
             <span class="input-group-btn">
-              <button type="button" class="btn btn-block btn-default center-block" onclick="deal()">Deal</button>
+              <button type="button" class="btn btn-block btn-primary center-block" onclick="deal()">Deal</button>
             </span>
           </div>
+          <button class="btn btn-danger" onclick="remove_players()" style="margin-bottom:26.5px;">Delete</button>
+          <button class="btn btn-success" onclick="check_for_bingo()" style="margin-bottom:26.5px;">Check for Bingo</button>
         </div>
       </div>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Cards</th>
-            <th class="text-right">
-              <button class="btn btn-danger btn-xs" onclick="remove_players()">Delete</button>
-              <button class="btn btn-success btn-xs" onclick="check_for_bingo()">Check for Bingo</button>
-              <input id="select-all" type="checkbox" style="margin-left: 10px;" onclick="const cbs=document.getElementsByName('player');for(var i = 0; i < cbs.length;i++){cbs[i].checked=this.checked;}"></input>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="players"></tbody>
-      </table>
+      <div class="row">
+        <div class="col-sm-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Cards</th>
+                <th class="text-right">
+                  <label>
+                    Select All <input id="select-all" type="checkbox" style="margin-left: 10px;" onclick="const cbs=document.getElementsByName('player');for(var i = 0; i < cbs.length;i++){cbs[i].checked=this.checked;}"></input>
+                  </label>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="players"></tbody>
+          </table>
+        </div>
+      </div>
 
       <!-- bingo check modall -->
       <div id="bingoCheckModal" class="modal fade" role="dialog">
@@ -249,234 +253,238 @@
         </div>
       </div>
 
+    </div>
+
+    {% endif %}
 
 
 
-      {% endif %}
 
+    <script>
 
+      var left = [];
 
-      <!-- on an interval, query the board and last called information -->
-      <script>
+      var saved_last = '';
+      var saved_board_string = '';
 
-        var last_string = '';
-        var board_string = '';
-
-        function update_board() {
-          $.ajax({
-            url: '/game_access/board',
-            data: {'code':'{{ code }}'},
-            type: 'POST',
-            cache: false,
-            success: function(response) {
-              if (response.success == 'true') {
-                if (response.last != last_string) {
-                  last_string = response.last;
-                  document.getElementById('last').innerHTML = response.last;
-                }
-                if (response.board != board_string) {
-                  board_string = response.board;
-                  const string_board_array = response.board.split('');
-                  board = [];
-                  left = [];
-                  for (var i = 0; i < 75; i++) {
-                    board.push(Number(string_board_array[i]));
-                    if (string_board_array[i] == '0') {
-                      left.push(i + 1);
-                    }
-                    document.getElementById(i + 1).setAttribute('value',string_board_array[i]);
-                  }
-                  document.getElementById('draw').disabled = left.length == 0;
-                }
-              }
-            },
-            error: function(error){
-              console.log(error);
-            }
-          });
+      function update_board_display(board_string) {
+        saved_board_string = board_string;
+        const string_board_array = board_string.split('');
+        left = [];
+        for (var i = 0; i < 75; i++) {
+          if (string_board_array[i] == '0') {
+            left.push(i + 1);
+          }
+          document.getElementById(i + 1).setAttribute('light',string_board_array[i]);
         }
+        document.getElementById('draw').disabled = left.length == 0;
+      }
 
+      function update_board() {
+        $.ajax({
+          url: '/game_access/board',
+          data: {'code':'{{ code }}'},
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              if (response.last != saved_last) {
+                saved_last = response.last;
+                document.getElementById('last').innerHTML = response.last;
+              }
+              if (response.board != saved_board_string) {
+                update_board_display(response.board);
+              }
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
 
-        var board = [];
-        var left = [];
+    </script>
 
+    {% if mode == "player" %}
+
+    <script>
+      update_board();
+      setInterval(function() {
         update_board();
+      }, 2000);
+    </script>
 
-        setInterval(function() {
-          update_board();
-        }, 2000);
+    {% else %}
 
+    <!-- square handling -->
+    <script>
+      function flip_square(num) {
+        left = left.filter(function(ele) {
+            return ele != num;
+        });
+        $.ajax({
+          url: '/host_access/flip_square',
+          data: {
+            'code':'{{ code }}',
+            'num':num
+          },
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              update_players();
+            } else {
+              console.log(response.error);
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
 
+      document.body.onkeyup = function(e){
+        if (left.length != 0 && e.keyCode === 68) {
+            draw();
+        }
+      }
 
-      </script>
+      function draw() {
+        const r = Math.floor(Math.random() * left.length);
+        flip_square(left[r]);
+        if (left.length == 0) {
+          document.getElementById('draw').disabled = true;
+        }
+      }
 
+      function clear_board() {
+        $.ajax({
+          url: '/host_access/clear_board',
+          data: {'code':'{{ code }}'},
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              update_players();
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+    </script>
 
+    <!-- players -->
+    <script>
+      var saved_player_dict_string = '';
 
-      {% if mode == 'host' %}
+      const players = document.getElementById('players');
 
-      <!-- square handling -->
-      <script>
-        function flip_square(num) {
-          board[num - 1] = 1 - board[num - 1];
-          left = left.filter(function(ele) {
-              return ele != num;
-          });
+      function get_checked_players(bool) {
+        const cbs = document.getElementsByName('player');
+        var players = [];
+        for (var i = 0; i < cbs.length; i++) {
+          if (cbs[i].checked || bool) {
+            players.push(cbs[i].value);
+          }
+        }
+        return players;
+      }
+
+      function get_table(grid) {
+        grid[2][2] = "FS";
+        var html = "<table class='text-center table table-bordered' style='margin: 0px;'>";
+        html += "<tr><td class='B'>B</td><td class='I'>I</td><td class='N'>N</td><td class='G'>G</td><td class='O'>O</td></tr>"
+        for (var r = 0; r < grid.length; r++) {
+          html += "<tr>";
+          for (var c = 0; c < grid[r].length; c++) {
+            html += "<td light='" + ((r == 2 && c == 2) || saved_board_string[grid[r][c] - 1] == '1' ? 1 : 0) + "'>" + grid[r][c] + "</td>";
+          }
+          html += "</tr>";
+        }
+        html += "</table>";
+        return html;
+      }
+
+      function update_player_display(player_dict) {
+        saved_player_dict_string = JSON.stringify(player_dict);
+        document.getElementById('select-all').checked = false;
+        while (players.firstChild) {
+          players.removeChild(players.firstChild);
+        }
+        for (var player in player_dict) {
+          const tr = document.createElement('tr');
+          const player_name_col = document.createElement('td');
+          const cards_col = document.createElement('td');
+          const button_col = document.createElement('td');
+          player_name_col.appendChild(document.createTextNode(player));
+          for (var i = 0; i < player_dict[player].length; i++) {
+            const cardID = player_dict[player][i][0];
+            const grid = player_dict[player][i][1];
+            const badge = document.createElement('span');
+            badge.classList.add('badge');
+            badge.onclick = function(){ window.open("/cards/" + cardID, '_blank')};
+            badge.appendChild(document.createTextNode(cardID));
+            badge.setAttribute('id',player_dict[player][i]);
+            badge.setAttribute('data-toggle','popover');
+            badge.setAttribute('data-placement','top');
+            badge.setAttribute('data-trigger','hover');
+            badge.setAttribute('data-html','true');
+            badge.setAttribute('data-content',get_table(grid));
+            cards_col.appendChild(badge);
+            cards_col.appendChild(document.createTextNode(" "));
+          }
+          button_col.classList = "text-right";
+          const input = document.createElement('input');
+          input.name = "player";
+          input.value = player;
+          input.type = "checkbox";
+          button_col.appendChild(input);
+          tr.appendChild(player_name_col);
+          tr.appendChild(cards_col);
+          tr.appendChild(button_col);
+          players.appendChild(tr);
+        }
+        $('[data-toggle="popover"]').popover();
+      }
+
+      function update_players() {
+        $.ajax({
+          url: '/host_access/get_players',
+          data: {'code':'{{ code }}'},
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              if (response.last != saved_last) {
+                saved_last = response.last;
+                document.getElementById('last').innerHTML = response.last;
+              }
+              if (response.board != saved_board_string) {
+                update_board_display(response.board);
+                update_player_display(response.player_dict);
+              } else if (saved_player_dict_string != JSON.stringify(response.player_dict)) {
+                update_player_display(response.player_dict);
+              }
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+
+      function remove_players() {
+        const cps = get_checked_players();
+        if (cps.length != 0) {
           $.ajax({
-            url: '/host_access/flip_square',
+            url: '/host_access/remove_players',
             data: {
               'code':'{{ code }}',
-              'num':num
+              'players':cps.join(",")
             },
-            type: 'POST',
-            cache: false,
-            success: function(response) {
-              if (response.success == 'true') {
-                update_board();
-              } else {
-                console.log(response.error);
-              }
-            },
-            error: function(error){
-              console.log(error);
-            }
-          });
-        }
-
-        document.body.onkeyup = function(e){
-          if (left.length != 0 && e.keyCode === 68) {
-              draw();
-          }
-        }
-
-        function draw() {
-          const r = Math.floor(Math.random() * left.length);
-          flip_square(left[r]);
-          if (left.length == 0) {
-            document.getElementById('draw').disabled = true;
-          }
-        }
-
-        function clear_board() {
-          $.ajax({
-            url: '/host_access/clear_board',
-            data: {'code':'{{ code }}'},
-            type: 'POST',
-            cache: false,
-            success: function(response) {
-              if (response.success == 'true') {
-                update_board();
-                update_last();
-              }
-            },
-            error: function(error){
-              console.log(error);
-            }
-          });
-        }
-
-      </script>
-
-      <!-- player info -->
-      <script>
-        const players = document.getElementById('players');
-
-        var player_dict_string = '';
-
-        function update_players() {
-          $.ajax({
-            url: '/host_access/get_players',
-            data: {'code':'{{ code }}'},
-            type: 'POST',
-            cache: false,
-            success: function(player_dict) {
-              if (player_dict_string != JSON.stringify(player_dict)) {
-                player_dict_string = JSON.stringify(player_dict);
-                document.getElementById('select-all').checked = false;
-                while (players.firstChild) {
-                  players.removeChild(players.firstChild);
-                }
-                for (var player in player_dict) {
-                  const tr = document.createElement('tr');
-                  const player_name_col = document.createElement('td');
-                  const cards_col = document.createElement('td');
-                  const button_col = document.createElement('td');
-                  player_name_col.appendChild(document.createTextNode(player));
-                  for (var i = 0; i < player_dict[player].length; i++) {
-                    const a = document.createElement('a');
-                    a.href = "/card/" + player_dict[player][i];
-                    a.appendChild(document.createTextNode(player_dict[player][i]));
-                    cards_col.appendChild(a);
-                    if (i < player_dict[player].length - 1) {
-                      a.appendChild(document.createTextNode(", "));
-                    }
-                  }
-                  button_col.classList = "text-right";
-                  const input = document.createElement('input');
-                  input.name = "player";
-                  input.value = player;
-                  input.type = "checkbox";
-                  button_col.appendChild(input);
-                  tr.appendChild(player_name_col);
-                  tr.appendChild(cards_col);
-                  tr.appendChild(button_col);
-                  players.appendChild(tr);
-                }
-              }
-
-            },
-            error: function(error){
-              console.log(error);
-            }
-          });
-        }
-
-        function get_checked_players() {
-          const cbs = document.getElementsByName('player');
-          var players = [];
-          for (var i = 0; i < cbs.length; i++) {
-            if (cbs[i].checked) {
-              players.push(cbs[i].value);
-            }
-          }
-          return players;
-        }
-
-
-        function remove_players() {
-          const cps = get_checked_players();
-          if (cps.length != 0) {
-            $.ajax({
-              url: '/host_access/remove_players',
-              data: {
-                'code':'{{ code }}',
-                'players':cps.join(",")
-              },
-              async:true,
-              type: 'POST',
-              cache: false,
-              success: function(response) {
-                update_players();
-              },
-              error: function(error){
-                console.log(error);
-              }
-            });
-          }
-        }
-
-        update_players();
-        setInterval(update_players,2000);
-      </script>
-
-      <!-- dealing -->
-      <script>
-        function deal() {
-          $.ajax({
-            url: '/host_access/deal',
-            data: {
-              'code':'{{ code }}',
-              'num_cards':document.getElementById('num-cards').value
-            },
+            async:true,
             type: 'POST',
             cache: false,
             success: function(response) {
@@ -487,113 +495,87 @@
             }
           });
         }
-      </script>
+      }
 
-      <script>
-        function check_for_bingo() {
-          const cps = get_checked_players();
-          if (cps.length != 0) {
-            $.ajax({
-              url: '/host_access/check_for_bingo',
-              data: {
-                'code':'{{ code }}',
-                'players':cps.join(",")
-              },
-              async:true,
-              type: 'POST',
-              cache: false,
-              success: function(response) {
-                console.log(response);
-                const ul = document.getElementById('check-bingo-list');
-                while (ul.firstChild) {
-                  ul.removeChild(ul.firstChild);
-                }
-                for (var player in response.bingo_dict) {
-                  const li = document.createElement('li');
-                  li.classList.add('list-group-item');
-                  li.appendChild(document.createTextNode(player));
-                  for (var i = 0; i < response.bingo_dict[player].length; i++) {
-                    const cardID = response.bingo_dict[player][i][0];
-                    const types = response.bingo_dict[player][i][1];
-                    const span = document.createElement('span');
-                    span.setAttribute('data-toggle','tooltip');
-                    span.setAttribute('title',types.join(', '));
-                    span.classList.add('badge');
-                    span.appendChild(document.createTextNode(cardID));
-                    li.appendChild(span);
-                  }
-                  ul.appendChild(li);
-                }
-                $("#bingoCheckModal").modal();
-                $('[data-toggle="tooltip"]').tooltip();
-              },
-              error: function(error){
-                console.log(error);
-              }
-            });
+      function deal() {
+        const cps = get_checked_players();
+        var players = get_checked_players(cps.length == 0).join(",");
+        $.ajax({
+          url: '/host_access/deal',
+          data: {
+            'code':'{{ code }}',
+            'num_cards':document.getElementById('num-cards').value,
+            'players':players
+          },
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            update_players();
+          },
+          error: function(error){
+            console.log(error);
           }
+        });
+      }
+
+      function check_for_bingo() {
+        const cps = get_checked_players();
+        if (cps.length != 0) {
+          $.ajax({
+            url: '/host_access/check_for_bingo',
+            data: {
+              'code':'{{ code }}',
+              'players':cps.join(",")
+            },
+            async:true,
+            type: 'POST',
+            cache: false,
+            success: function(response) {
+              const ul = document.getElementById('check-bingo-list');
+              while (ul.firstChild) {
+                ul.removeChild(ul.firstChild);
+              }
+              var empty = true;
+              for (var player in response.bingo_dict) {
+                empty = false;
+                const li = document.createElement('li');
+                li.classList.add('list-group-item');
+                li.appendChild(document.createTextNode(player));
+                for (var i = 0; i < response.bingo_dict[player].length; i++) {
+                  const cardID = response.bingo_dict[player][i][0];
+                  const types = response.bingo_dict[player][i][1];
+                  const span = document.createElement('span');
+                  span.setAttribute('data-toggle','tooltip');
+                  span.setAttribute('title',types.join(', '));
+                  span.classList.add('badge');
+                  span.appendChild(document.createTextNode(cardID));
+                  li.appendChild(span);
+                }
+                ul.appendChild(li);
+              }
+              if (empty) {
+                ul.appendChild(document.createTextNode('No BINGO found!'));
+              }
+              $("#bingoCheckModal").modal();
+              $('[data-toggle="tooltip"]').tooltip();
+            },
+            error: function(error){
+              console.log(error);
+            }
+          });
         }
-      </script>
+      }
 
-
-      {% endif %}
-
-
-
-
-
-
-
-
-
-
-
-
-      </div>
-
-
-    </div>
-
-
-
-
-
-
-  <script>
-
-
-    //
-    // function check() {
-    //   var alreadyChosenNumpy = [];
-    //   cardID = document.getElementById('cardID').value;
-    //
-    //   if (cardID != "" && alreadyChosenNumpy.length != 0) {
-    //
-    //     var alreadyChosenStr = "" + alreadyChosenNumpy[0];
-    //     for (i = 1; i < alreadyChosenNumpy.length; i++) {
-    //       alreadyChosenStr = alreadyChosenStr + "&" + alreadyChosenNumpy[i];
-    //     }
-    //
-    //     $.ajax({
-    //       url: '/check',
-    //       data: {alreadyChosenStr: alreadyChosenStr, cardID: cardID},
-    //       type: 'POST',
-    //       cache: false,
-    //       success: function(response){
-    //         console.log(response);
-    //       },
-    //       error: function(error){
-    //         document.getElementById('create_error').innerHTML = "error";
-    //         console.log(error);
-    //       },
-    //     });
-    //   }
-    // }
-    //
-
-
+      update_players();
+      setInterval(update_players,2000);
 
     </script>
+
+
+    {% endif %}
+
+
+
 
     <br><br><br><br>
     <br><br><br><br>

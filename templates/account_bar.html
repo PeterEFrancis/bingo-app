@@ -34,7 +34,7 @@
             <td>{{g.date}}</td>
             <td id="game-{{g.get_code()}}"></td>
             <script>
-              document.getElementById('game-{{g.get_code()}}').innerHTML = '{{g.players}}' == '' ? 0 : '{{g.players}}'.split(',').length;
+              document.getElementById('game-{{g.get_code()}}').innerHTML = Object.keys({{g.players|safe}}).length;;
             </script>
           </tr>
         {% endfor %}
