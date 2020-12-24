@@ -282,10 +282,10 @@
       <div class="row">
         <div class="col-sm-4">
           <div class="material-switch">
-            <input id="allow-join" name="allow-join" type="checkbox" onchange='set_open(this.checked ? "1" : "0")' {% if open=='True' %} checked {% endif %}/>
+            <input id="allow-join" name="allow-join" type="checkbox" onchange='set_open(this.checked ? "1" : "0")' {% if open %} checked {% endif %}/>
 
             <label for="allow-join" class="label-info"></label>
-            <p id="game-state">Game {% if open=='True' %} open {% else %} closed {% endif %}</p>
+            <p id="game-state">Game {% if open %} open {% else %} closed {% endif %}</p>
           </div>
         </div>
         <div class="col-md-8 text-right" style="margin-top: 20px;">
