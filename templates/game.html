@@ -16,12 +16,12 @@
     <meta http-equiv="pragma" content="no-cache"/>
 
     <title>
-      Bingo Caller
+      Bingo | Game
     </title>
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
     <style>
       body {
-        min-width: 300px;
+        min-width: 360px;
         background-color: white;
       }
 
@@ -61,6 +61,55 @@
         cursor: pointer;
       }
 
+      /* switch */
+      .material-switch > input[type="checkbox"] {
+        display: none;
+      }
+
+      .material-switch > label {
+        cursor: pointer;
+        height: 0px;
+        position: relative;
+        width: 40px;
+      }
+
+      .material-switch > label::before {
+        background: rgb(0, 0, 0);
+        box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        content: '';
+        height: 16px;
+        margin-top: -8px;
+        position:absolute;
+        opacity: 0.3;
+        transition: all 0.4s ease-in-out;
+        width: 40px;
+      }
+
+      .material-switch > label::after {
+        background: rgb(255, 255, 255);
+        border-radius: 16px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+        content: '';
+        height: 24px;
+        left: -4px;
+        margin-top: -8px;
+        position: absolute;
+        top: -4px;
+        transition: all 0.3s ease-in-out;
+        width: 24px;
+      }
+
+      .material-switch > input[type="checkbox"]:checked + label::before {
+        background: inherit;
+        opacity: 0.5;
+      }
+
+      .material-switch > input[type="checkbox"]:checked + label::after {
+        background: inherit;
+        left: 20px;
+      }
+
     </style>
   </head>
   <body>
@@ -93,18 +142,17 @@
             <div class="modal-body">
               Players can join at
               <div class="input-group" style="margin-top:10px;">
-                <input id="join-link" class="form-control" value="/join/{{code}}" onclick="this.select();" readonly></input>
+                <input id="join-link" class="form-control" onclick="this.select();" readonly></input>
                 <span class="input-group-btn">
                   <button type="button" class="btn btn-default" onclick="copy_link('join-link')">
                     <span class="glyphicon glyphicon-copy"></span>
                   </button>
                 </span>
               </div>
-
               <br>
               Players can watch the board at
               <div class="input-group" style="margin-top:10px;">
-                <input id="game-link" class="form-control" value="/game/{{code}}" onclick="this.select();" readonly></input>
+                <input id="game-link" class="form-control" onclick="this.select();" readonly></input>
                 <span class="input-group-btn">
                   <button type="button" class="btn btn-default" onclick="copy_link('game-link')">
                     <span class="glyphicon glyphicon-copy"></span>
@@ -117,7 +165,7 @@
       </div>
 
       <script>
-        document.getElementById('join-link').value = window.location.origin + "/join/{{code}}";
+        document.getElementById('join-link').value = window.location.origin + "/play/{{code}}";
         document.getElementById('game-link').value = window.location.href;
 
         function copy_link(id) {
@@ -229,17 +277,26 @@
       </div>
 
       <!-- Player info -->
+
       <br><br><br>
       <div class="row">
-        <div class="col-sm-12 text-right" style="margin-bottom:-26.5px">
-          <div class="input-group" style="width: 150px; display: inline-table;">
-            <input id="num-cards" class="form-control" placeholder="Number of Cards" type="number" value="1"/>
+        <div class="col-sm-4">
+          <div class="material-switch">
+            <input id="allow-join" name="allow-join" type="checkbox" onchange='set_open(this.checked ? "1" : "0")' {% if open=='True' %} checked {% endif %}/>
+
+            <label for="allow-join" class="label-info"></label>
+            <p id="game-state">Game {% if open=='True' %} open {% else %} closed {% endif %}</p>
+          </div>
+        </div>
+        <div class="col-md-8 text-right" style="margin-top: 20px;">
+          <div class="input-group" style="width: 110px; display: inline-table;">
+            <input id="num-cards" class="form-control" placeholder="Number of Cards" type="number" value="1" style="margin-bottom:-13.25px"/>
             <span class="input-group-btn">
               <button type="button" class="btn btn-block btn-primary center-block" onclick="deal()">Deal</button>
             </span>
           </div>
-          <button class="btn btn-danger" onclick="remove_players()" style="margin-bottom:26.5px;">Delete</button>
-          <button class="btn btn-success" onclick="check_for_bingo()" style="margin-bottom:26.5px;">Check for Bingo</button>
+          <button class="btn btn-danger" onclick="remove_players()">Remove</button>
+          <button class="btn btn-success" onclick="check_for_bingo()">Check for Bingo</button>
         </div>
       </div>
       <div class="row">
@@ -588,6 +645,27 @@
             }
           });
         }
+      }
+
+      function set_open(open) {
+        $.ajax({
+          url: '/host_access/set_open',
+          data: {
+            'code':'{{ code }}',
+            'open':open
+          },
+          async:true,
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              document.getElementById('game-state').innerHTML = "Game " + (response.open == 'true' ? "open" : "closed");
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
       }
 
       update_players();

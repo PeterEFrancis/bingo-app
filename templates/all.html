@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>All Bingo Games</title>
+  <title>Bingo | All Games</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="static/img/leaf.gif" type="image/gif">
@@ -31,6 +31,7 @@
           <tr>
             <th>ID</th>
             <th>Code</th>
+            <th>Open</th>
             <th>Host</th>
             <th>Date</th>
             <th>Board number</th>
@@ -43,10 +44,11 @@
             <tr>
               <td> {{ g.id }} </td>
               <td> <a href="/game/{{g.get_code()}}" target="_blank">{{ g.get_code() }}</a></td>
+              <td> {{ g.open }} </td>
               <td> {{ g.host }} </td>
               <td> {{ g.date }} </td>
               <td> {{ g.board }} </td>
-              <td> {{ g.last }} </td>
+              <td> {{ g.last|safe }} </td>
               <td> {{ g.players }} </td>
             </tr>
           {% endfor %}

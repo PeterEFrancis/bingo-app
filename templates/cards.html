@@ -15,7 +15,7 @@
     <meta http-equiv="pragma" content="no-cache"/>
 
     <title>
-      Bingo Card
+      Bingo | Cards
     </title>
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
     <style>
@@ -47,12 +47,30 @@
 
       <div class="noprint row" style="margin-top: 5px;">
         <div class="col-md-12 text-right">
+          <button type="button" class="btn btn-danger btn-xs" onclick="leave_game()">Leave Game</button>
           <button type="button" class="btn btn-info btn-xs" onclick="location.reload(true)">Fetch Cards</button>
           <a href="/">
             <span class="glyphicon glyphicon-home"></span>
           </a>
         </div>
       </div>
+
+      <script>
+        function leave_game() {
+          $.ajax({
+            url: '/leave_game',
+            data: {code: '{{code}}'},
+            type: 'POST',
+            cache: false,
+            success: function(response) {
+              location.reload(true);
+            },
+            error: function(error) {
+              console.log(error);
+            },
+          });
+        }
+      </script>
 
       <h1>{{ player }}</h1>
 

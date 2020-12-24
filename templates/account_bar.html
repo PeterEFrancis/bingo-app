@@ -27,15 +27,23 @@
             <th>Game Join Code</th>
             <th>Date Created</th>
             <th>Players</th>
+            <th></th>
           </tr>
         {% for g in games %}
-          <tr>
+          <tr id="{{g.get_code()}}-row">
             <td><a href="/game/{{g.get_code()}}">{{g.get_code()}}</a></td>
             <td>{{g.date}}</td>
             <td id="game-{{g.get_code()}}"></td>
             <script>
               document.getElementById('game-{{g.get_code()}}').innerHTML = Object.keys({{g.players|safe}}).length;;
             </script>
+            <td>
+              <div class="text-right">
+                <button class="btn btn-danger btn-xs" onclick="delete_game('{{g.get_code()}}')">
+                  <span class="glyphicon glyphicon-trash"></span>
+                </button>
+              </div>
+            </td>
           </tr>
         {% endfor %}
         </table>
@@ -259,22 +267,23 @@
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  function delete_game(code) {
+    $.ajax({
+      url: '/host_access/delete_game',
+      data: {'code':code},
+      type: 'POST',
+      cache: false,
+      success: function(response) {
+        document.getElementById(code + '-row').remove();
+        if (window.location.href.endsWith(code)) {
+          window.location.href = '/';
+        }
+      },
+      error: function(error) {
+        console.log(error);
+      },
+    });
+  }
 
 
 
