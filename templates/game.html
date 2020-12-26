@@ -362,7 +362,7 @@
 
       function update_board() {
         $.ajax({
-          url: '/game_access/board',
+          url: '/board_access',
           data: {'code':'{{ code }}'},
           type: 'POST',
           cache: false,

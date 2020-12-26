@@ -80,10 +80,19 @@ class Game(db.Model):
         db.session.commit()
 
     def deal(self, num_cards, players):
+        # get new cards, and check that none of them are the same as the past cards
         pdict = eval(self.players)
-        cardIDs = get_n_cards(len(players) * num_cards)
+        oldCardIDs = []
+        for player in pdict:
+            oldCardIDs += pdict[player]
+        newCardIDs = []
+        num = num_cards + len(oldCardIDs)
+        while len(list(set(oldCardIDs + newCardIDs))) < num:
+            # this is not efficient,
+            # ... but there is about a 0% chance this will ever be executed
+            newCardIDs = get_n_cards(len(players) * num_cards)
         for i, player in enumerate(players):
-            pdict[player] = cardIDs[i * num_cards : (i + 1) * num_cards]
+            pdict[player] = newCardIDs[i * num_cards : (i + 1) * num_cards]
         self.players = str(pdict)
         db.session.commit()
 
@@ -113,74 +122,6 @@ def is_game(code):
     return len(list(db.session.query(Game).filter(Game.id == code_to_id(code)))) != 0
 
 
-@app.route('/game_access/<string:s>', methods=['POST'])
-def game_access(s):
-    if request.method != 'POST':
-        return 'Access Denied',403
-    if not is_game(request.form['code']):
-        return "No game found.",404
-    game = get_game(request.form['code'])
-    if s == 'board':
-        return jsonify({'success':'true', 'board':game.board, 'last':game.last})
-    return 'Access Denied.'
-
-
-@app.route('/host_access/<string:function>', methods=['POST'])
-def host_access(function):
-    if request.method != 'POST':
-        'Access Denied.',403
-    if 'username' not in session:
-        return jsonify({'success':'false', 'error':"You are not signed in."})
-    code = request.form['code']
-    if not is_game(code):
-        return jsonify({'success':'false', 'error':'No Game Found.'})
-    game = get_game(code)
-    if not get_user(session['username']).has_game(game):
-        return jsonify({'success':'false', 'error':"You don't have access to edit this game."})
-
-    if function == "flip_square":
-        game.flip_square(int(request.form['num']))
-        return jsonify({'success':'true'})
-    elif function == "clear_board":
-        game.clear_board()
-        return jsonify({'success':'true'})
-    elif function == "get_players":
-        pdict_old = eval(game.players)
-        pdict = {}
-        for player in pdict_old:
-            pdict[player] = [[cardID, decode(cardID).tolist()] for cardID in pdict_old[player]]
-        return jsonify({'success':'true', 'player_dict':pdict, 'board':game.board, 'last':game.last})
-    elif function == "remove_players":
-        for p in request.form['players'].split(","):
-            game.remove_player(p)
-        return jsonify({'success':'true'})
-    elif function == "check_for_bingo":
-        bingo_dict = {}
-        pdict = eval(game.players)
-        for p in request.form['players'].split(","):
-            player_cardIDs = pdict[p]
-            for cardID in player_cardIDs:
-                check = check_card(cardID, game.board, BINGO_TYPES)
-                if len(check) > 0:
-                    if p not in bingo_dict:
-                        bingo_dict[p] = []
-                    bingo_dict[p].append([cardID, check])
-        return jsonify({'success':'true', 'bingo_dict': bingo_dict})
-    elif function == "deal":
-        game.deal(int(request.form['num_cards']), request.form['players'].split(','))
-        return jsonify({'success':'true'})
-    elif function == "set_open":
-        game.set_open(bool(int(request.form['open'])))
-        return jsonify({'success':'true', 'open':'true' if game.open else 'false'})
-    elif function == "delete_game":
-        db.session.query(Game).filter(Game.id == code_to_id(code)).delete()
-        db.session.commit()
-        return jsonify({'success':'true'})
-    else:
-        return 'Access Denied.',403
-
-
-
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -196,7 +137,15 @@ class User(db.Model):
         self.games = ''
 
     def add_game(self, game):
-        self.games += str(game.id) + ','
+        g = self.games.split(',')
+        g.append(str(game.id))
+        self.games = ",".join(g)
+        db.session.commit()
+
+    def remove_game(self, game):
+        g = self.games.split(',')
+        g.remove(str(game.id))
+        self.games = ",".join(g)
         db.session.commit()
 
     def has_game(self, game):
@@ -210,20 +159,17 @@ def get_user(username):
     return db.session.query(User).filter(User.username == username)[0]
 
 
+
+
+
+
 @app.route('/initialize')
 def initialize():
     db.drop_all()
     db.create_all()
-
-    for i in ['a','b','c','d']:
+    for i in ['a','b','admin']:
         db.session.add(User(f'{i}@{i}.com',i,i))
         db.session.commit()
-
-    return 'done'
-
-
-
-
 
 
 
@@ -381,6 +327,13 @@ def check_card(cardID, board, types):
     return out
 
 
+def get_cardHTML(cardIDs):
+    cardHTML = ""
+    for cardID in cardIDs:
+        cardHTML += ('<br>' * 5) + ('<br class="print">' * 5) + render_template('card.html', cardID=cardID, cardArray=decode(cardID).tolist())
+        if cardID != cardIDs[-1]:
+            cardHTML += '<div class="pagebreak"></div>'
+    return cardHTML
 
 
 
@@ -388,45 +341,56 @@ def check_card(cardID, board, types):
 
 
 
-#  _ __   __ _  __ _  ___    __ _  ___ ___ ___  ___ ___
-# | '_ \ / _` |/ _` |/ _ \  / _` |/ __/ __/ _ \/ __/ __|
-# | |_) | (_| | (_| |  __/ | (_| | (_| (_|  __/\__ \__ \
-# | .__/ \__,_|\__, |\___|  \__,_|\___\___\___||___/___/
-# |_|          |___/
 
-
-
+#              _     _ _
+#  _ __  _   _| |__ | (_) ___
+# | '_ \| | | | '_ \| | |/ __|
+# | |_) | |_| | |_) | | | (__
+# | .__/ \__,_|_.__/|_|_|\___|
+# |_|
 
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html', account_bar = get_account_bar())
+    return render_template('index.html', account_bar=get_account_bar())
+
+
+@app.route('/new_cards/<int:num>')
+def new_cards(num):
+    return redirect('/cards/' + ','.join(get_n_cards(num)))
+
+
+@app.route('/caller')
+def caller():
+    return render_template('caller.html')
 
 
 
-@app.route('/all')
-def all():
-    return render_template('all.html', all_games=db.session.query(Game), all_users=db.session.query(User))
 
 
 
 
-@app.route('/new_game', methods=['POST'])
-def new_game():
-    if request.method != 'POST':
-        return 'Access Denied',403
+
+#                  _             _
+#   ___ ___  _ __ | |_ ___ _ __ | |_
+#  / __/ _ \| '_ \| __/ _ | '_ \| __|
+# | (_| (_) | | | | ||  __| | | | |_
+#  \___\___/|_| |_|\__\___|_| |_|\__|
+
+
+
+def get_account_bar():
+    username = ''
     if 'username' in session:
-        game = Game(host=session['username'])
-        db.session.add(game)
-        db.session.commit()
-        get_user(session['username']).add_game(game)
-        return jsonify({'success':'true', 'code':game.get_code()})
-    else:
-        return jsonify({'success':'false', 'error':"You're not logged in."})
-
-
+        username = session['username']
+    return render_template(
+        'account_bar.html',
+        loggedin=('username' in session),
+        username=username,
+        games=db.session.query(Game).filter(Game.host == username)
+    )
 
 
 @app.route('/game/<string:code>')
@@ -436,8 +400,7 @@ def game(code):
     game = get_game(code)
     if 'username' in session:
         if get_user(session['username']).has_game(game):
-            return render_template(
-                'game.html',
+            return render_template('game.html',
                 account_bar = get_account_bar(),
                 mode = 'host',
                 code = game.get_code(),
@@ -454,19 +417,135 @@ def game(code):
     )
 
 
-
-
-
-def get_account_bar():
-    username = ''
-    if 'username' in session:
-        username = session['username']
+@app.route('/cards/<string:cardIDstrings>')
+def cards(cardIDstrings):
+    cardIDs = cardIDstrings.split(',')
     return render_template(
-        'account_bar.html',
-        loggedin=('username' in session),
-        username=username,
-        games=db.session.query(Game).filter(Game.host == username)
+        'cards.html',
+        mode='blank',
+        num=len(cardIDs),
+        cardHTML=get_cardHTML(cardIDs)
     )
+
+
+@app.route('/play')
+def play_blank():
+    return render_template('join.html', account_bar=get_account_bar(), code="")
+
+
+@app.route('/play/<string:code>')
+def play(code):
+    if not is_game(code):
+        return f"No Game with code '{code}' found.", 404
+    game = get_game(code)
+    # if player has been in game
+    if 'player-' + code in session:
+        # if game currently has player
+        if get_game(code).has_player(session['player-' + code]):
+            cardIDs = eval(game.players)[session['player-' + code]]
+            return render_template('cards.html', code=code, mode='player', player=session['player-' + code], num=len(cardIDs), cardHTML=get_cardHTML(cardIDs))
+        # otherwise, player was removed from game, so remove from session
+        session.pop('player-' + code, None)
+    # otherwise, show form to join
+    return render_template('join.html', account_bar = get_account_bar(), code = code)
+
+
+@app.route('/admin')
+def admin():
+    if not is_user('admin'):
+        return redirect('/')
+    if 'username' not in session or session['username'] != 'admin':
+        return 'Access denied.', 403
+
+    return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
+
+
+
+
+#    __ _  ___ ___ ___ ___ ___
+#   / _` |/ __/ __/ _ / __/ __|
+#  | (_| | (_| (_|  __\__ \__ \
+#   \__,_|\___\___\___|___|___/
+
+
+
+
+
+@app.route('/host_access/<string:function>', methods=['POST'])
+def host_access(function):
+    if request.method != 'POST':
+        'Access Denied.',403
+    if 'username' not in session:
+        return jsonify({'success':'false', 'error':"You are not logged in."})
+    if not is_user(session['username']):
+        return jsonify({'success':'false', 'error':"You are logged into a user that no longer exists."})
+    code = request.form['code']
+    if not is_game(code):
+        return jsonify({'success':'false', 'error':'No Game Found.'})
+    game = get_game(code)
+    if not get_user(session['username']).has_game(game):
+        return jsonify({'success':'false', 'error':"You don't have access to edit this game."})
+
+    if function == "flip_square":
+        game.flip_square(int(request.form['num']))
+        return jsonify({'success':'true'})
+    elif function == "clear_board":
+        game.clear_board()
+        return jsonify({'success':'true'})
+    elif function == "get_players":
+        pdict_old = eval(game.players)
+        pdict = {}
+        for player in pdict_old:
+            pdict[player] = [[cardID, decode(cardID).tolist()] for cardID in pdict_old[player]]
+        return jsonify({'success':'true', 'player_dict':pdict, 'board':game.board, 'last':game.last})
+    elif function == "remove_players":
+        for p in request.form['players'].split(","):
+            game.remove_player(p)
+        return jsonify({'success':'true'})
+    elif function == "check_for_bingo":
+        bingo_dict = {}
+        pdict = eval(game.players)
+        for p in request.form['players'].split(","):
+            player_cardIDs = pdict[p]
+            for cardID in player_cardIDs:
+                check = check_card(cardID, game.board, BINGO_TYPES)
+                if len(check) > 0:
+                    if p not in bingo_dict:
+                        bingo_dict[p] = []
+                    bingo_dict[p].append([cardID, check])
+        return jsonify({'success':'true', 'bingo_dict': bingo_dict})
+    elif function == "deal":
+        game.deal(int(request.form['num_cards']), request.form['players'].split(','))
+        return jsonify({'success':'true'})
+    elif function == "set_open":
+        game.set_open(bool(int(request.form['open'])))
+        return jsonify({'success':'true', 'open':'true' if game.open else 'false'})
+    elif function == "delete_game":
+        db.session.query(Game).filter(Game.id == code_to_id(code)).delete()
+        get_user(session['username']).remove_game(game)
+        return jsonify({'success':'true'})
+    else:
+        return 'Access Denied.',403
+
+
+
+
+@app.route('/new_game', methods=['POST'])
+def new_game():
+    if request.method != 'POST':
+        return 'Access Denied.',403
+    if 'username' not in session:
+        return jsonify({'success':'false', 'error':"You're not logged in."})
+
+        game = Game(host=session['username'])
+
+    if not is_user(session['username']):
+        return jsonify({'success':'false', 'error':"You are logged into a user that no longer exists."})
+    db.session.add(game)
+    db.session.commit()
+    get_user(session['username']).add_game(game)
+    return jsonify({'success':'true', 'code':game.get_code()})
+
 
 
 
@@ -520,68 +599,17 @@ def logout():
 
 
 
-@app.route('/new_cards/<int:num>')
-def new_cards(num):
-    return redirect('/cards/' + ','.join(get_n_cards(num)))
+@app.route('/board_access', methods=['POST'])
+def board_access():
+    if request.method != 'POST':
+        return 'Access Denied',403
+    if not is_game(request.form['code']):
+        return "No game found.",404
+    game = get_game(request.form['code'])
+    return jsonify({'success':'true', 'board':game.board, 'last':game.last})
 
 
 
-
-def get_cardHTML(cardIDs):
-    cardHTML = ""
-    for cardID in cardIDs:
-        cardHTML += ('<br>' * 5) + ('<br class="print">' * 5) + render_template('card.html', cardID=cardID, cardArray=decode(cardID).tolist())
-        if cardID != cardIDs[-1]:
-            cardHTML += '<div class="pagebreak"></div>'
-    return cardHTML
-
-
-
-@app.route('/cards/<string:cardIDstrings>')
-def cards(cardIDstrings):
-    cardIDs = cardIDstrings.split(',')
-    return render_template(
-        'cards.html',
-        mode='blank',
-        num=len(cardIDs),
-        cardHTML=get_cardHTML(cardIDs)
-    )
-
-
-
-
-@app.route('/caller')
-def caller():
-    return render_template('caller.html')
-
-
-
-
-
-
-
-
-@app.route('/play')
-def play_blank():
-    return render_template('join.html', account_bar=get_account_bar(), code="")
-
-
-
-@app.route('/play/<string:code>')
-def play(code):
-    if not is_game(code):
-        return f"No Game with code '{code}' found.", 404
-    game = get_game(code)
-    # if player has been in game
-    if 'player-' + code in session:
-        # if game currently has player
-        if get_game(code).has_player(session['player-' + code]):
-            cardIDs = eval(game.players)[session['player-' + code]]
-            return render_template('cards.html', code=code, mode='player', player=session['player-' + code], num=len(cardIDs), cardHTML=get_cardHTML(cardIDs))
-        # otherwise, player was removed from game, so remove from session
-        session.pop('player-' + code, None)
-    # otherwise, show form to join
-    return render_template('join.html', account_bar = get_account_bar(), code = code)
 
 
 
@@ -625,48 +653,11 @@ def leave_game():
 
 
 
-# @app.route('/join')
-# @app.route('/join/')
-# def join_free():
-#     return join('')
 
-# @app.route('/join/<string:code>')
-# def join(code):
-#     if is_game(code) or code == "":
-#         if 'player-' + code in session:
-#             if session['player-' + code] in eval(get_game(code).players):
-#                 return redirect('/play/' + code)
-#             # otherwise, player was removed from game, so remove from session
-#             session.pop('player-' + code, None)
-#         # otherwise, show form to join
-#         return render_template(
-#             'join.html',
-#             account_bar = get_account_bar(),
-#             code = code
-#         )
-#     return "No game found."
-#
-#
-#
-#
 
-# @app.route('/play/<string:code>')
-# def play(code):
-#     if not is_game(code):
-#         return jsonify({'success':'false', 'error':'No game found.'})
-#     game = get_game(code)
-#     if 'player-' + code not in session:
-#         return redirect('/join/' + code)
-#     if game.has_player(session['player-' + code]):
-#         cardIDs = eval(game.players)[session['player-' + code]]
-#         return render_template(
-#             'cards.html',
-#             mode='player',
-#             player=session['player-' + code],
-#             num=len(cardIDs),
-#             cardHTML=get_cardHTML(cardIDs)
-#         )
-#
+
+
+
 
 
 
