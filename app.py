@@ -12,7 +12,6 @@ from numba import njit
 import json
 import random
 import time
-import hashlib
 
 app = Flask(__name__)
 app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
@@ -161,14 +160,21 @@ def get_user(username):
 
 
 
-@app.route('/initialize')
+# @app.route('/initialize')
 def initialize():
     db.drop_all()
     db.create_all()
-    for i in ['a','b','admin']:
-        db.session.add(User(i,SHA1(i)))
+    users = [
+        ['a','86f7e437faa5a7fce15d1ddcb9eaeaea377667b8'],
+        ['b','e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98'],
+        ['admin','9b3217085b09efa6b051da901139f55ec18eee61']
+    ]
+    for user,hash in users:
+        db.session.add(User(user,hash))
         db.session.commit()
-    return 'done'
+    return 'done.'
+
+
 
 
 
@@ -337,9 +343,6 @@ def get_cardHTML(cardIDs):
 
 
 
-
-def SHA1(string):
-    return hashlib.sha1(string.encode()).hexdigest()
 
 
 
