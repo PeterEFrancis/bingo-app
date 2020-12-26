@@ -17,8 +17,8 @@ import hashlib
 app = Flask(__name__)
 app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
-# heroku = Heroku(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
+heroku = Heroku(app)
 
 
 
