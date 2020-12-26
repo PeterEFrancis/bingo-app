@@ -2,11 +2,8 @@
   font-family: 'Ubuntu', sans-serif;
 }
 
-h1 {
-  font-size: 50pt;
-}
 
-h3 {
+.square  > h3 {
   font-size: 25pt;
   margin: 15px 0px 15px;
 }

@@ -134,7 +134,7 @@ class User(db.Model):
         self.games = ''
 
     def add_game(self, game):
-        g = self.games.split(',')
+        g = [] if self.games == '' else self.games.split(',')
         g.append(str(game.id))
         self.games = ",".join(g)
         db.session.commit()
@@ -634,7 +634,7 @@ def join_game():
         return jsonify({'success':'false', 'error':'This game is not open to be joined.'})
     if game.has_player(request.form['player']):
         return jsonify({'success':'false', 'error':'This name is already in use. Try another!'})
-    if 'player-' + code in session:
+    if 'player-' + code in session and game.has_player(session['player-' + code]):
         return jsonify({'success':'false', 'error':f'You are already playing in this game with name <u>{session["player-" + code]}</u>.<br><br>Click <a href="/play/{code}">here</a> to play.'})
     session['player-' + code] = request.form['player']
     game.add_player(request.form['player'])
