@@ -12,13 +12,13 @@ from numba import njit
 import json
 import random
 import time
-
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
-heroku = Heroku(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
+# heroku = Heroku(app)
 
 
 
@@ -125,15 +125,13 @@ def is_game(code):
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.Text)
     username = db.Column(db.Text)
-    password = db.Column(db.Text)
+    hashed_password = db.Column(db.Text)
     games = db.Column(db.Text)
 
-    def __init__(self, email, username, password):
-        self.email = email
+    def __init__(self, username, hashed_password):
         self.username = username
-        self.password = password
+        self.hashed_password = hashed_password
         self.games = ''
 
     def add_game(self, game):
@@ -168,8 +166,9 @@ def initialize():
     db.drop_all()
     db.create_all()
     for i in ['a','b','admin']:
-        db.session.add(User(f'{i}@{i}.com',i,i))
+        db.session.add(User(i,SHA1(i)))
         db.session.commit()
+    return 'done'
 
 
 
@@ -336,6 +335,11 @@ def get_cardHTML(cardIDs):
     return cardHTML
 
 
+
+
+
+def SHA1(string):
+    return hashlib.sha1(string.encode()).hexdigest()
 
 
 
@@ -537,7 +541,7 @@ def new_game():
     if 'username' not in session:
         return jsonify({'success':'false', 'error':"You're not logged in."})
 
-        game = Game(host=session['username'])
+    game = Game(host=session['username'])
 
     if not is_user(session['username']):
         return jsonify({'success':'false', 'error':"You are logged into a user that no longer exists."})
@@ -560,7 +564,7 @@ def signup():
             User(
                 request.form['email'],
                 request.form['username'],
-                request.form['password']
+                request.form['hashed_password']
             )
         )
         db.session.commit()
@@ -577,7 +581,7 @@ def login():
     users = db.session.query(User).filter(User.username == request.form['username'])
     if len(list(users)) == 0:
         return jsonify({'success':'false','error':'No user with this username exists.'})
-    elif users[0].password != request.form['password']:
+    elif users[0].hashed_password != request.form['hashed_password']:
         return jsonify({'success':'false','error':'The entered password is incorrect.'})
     session['username'] = request.form['username']
     return jsonify({'success':'true'})
@@ -647,14 +651,6 @@ def leave_game():
             game.remove_player(player)
         session.pop('player-' + code, None)
     return jsonify({'success':'true'})
-
-
-
-
-
-
-
-
 
 
 

@@ -68,9 +68,8 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>email</th>
             <th>username</th>
-            <th>password</th>
+            <th>hashed_password</th>
             <th>Games</th>
           </tr>
         </thead>
@@ -78,9 +77,8 @@
           {% for u in all_users %}
             <tr>
               <td> {{ u.id }} </td>
-              <td> {{ u.email }} </td>
               <td> {{ u.username }} </td>
-              <td> {{ u.password }} </td>
+              <td> {{ u.hashed_password }} </td>
               <td> {{ u.games }} </td>
             </tr>
           {% endfor %}

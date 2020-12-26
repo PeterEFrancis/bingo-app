@@ -37,9 +37,12 @@
       <div class="noprint row" style="margin-top: 5px;">
         <div class="col-md-12 text-right">
           <button type="button" class="btn btn-info btn-xs" onclick="window.location.href='/new_cards/{{num}}'">Get New Cards</button>
-          <a href="/">
+          <button class="btn btn-link" onclick="window.print();return false;">
+            <span class="glyphicon glyphicon-print"></span>
+          </button>
+          <button class="btn btn-link" onclick="window.location='/'">
             <span class="glyphicon glyphicon-home"></span>
-          </a>
+          </button>
         </div>
       </div>
 

@@ -10,7 +10,9 @@
       <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#login-modal">Log In</button>
       <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#signup-modal">Sign Up</button>
     {% endif %}
-    <a href="/"><span class="glyphicon glyphicon-home"></span></a>
+    <button class="btn btn-link" onclick="window.location='/'">
+      <span class="glyphicon glyphicon-home"></span>
+    </button>
   </div>
 </div>
 
@@ -100,12 +102,6 @@
         <p>Create your account.</p>
         <div class="input-group" style="margin-top: 20px;">
           <span class="input-group-addon">
-            <span class="glyphicon glyphicon-envelope"></span>
-          </span>
-          <input id="signup-email" class="form-control" placeholder="email"/>
-        </div>
-        <div class="input-group" style="margin-top: 20px;">
-          <span class="input-group-addon">
             <span class="glyphicon glyphicon-user"></span>
           </span>
           <input id="signup-username" class="form-control" placeholder="username"/>
@@ -131,12 +127,10 @@
 </div>
 
 
+<script src="static/hash.js"></script>
 
 <script>
-  function emailIsValid (email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  }
-
+  
   function isAlphaNumeric(str) {
     var code, i, len;
 
@@ -151,15 +145,11 @@
     return true;
   };
 
-
   function signup() {
-    const email = document.getElementById('signup-email').value;
     const username = document.getElementById('signup-username').value;
     const password = document.getElementById('signup-password').value;
     const confirm_password = document.getElementById('signup-confirm-password').value;
-    if (!emailIsValid(email)) {
-      document.getElementById('signup-error').innerHTML = 'invalid email';
-    } else if (!isAlphaNumeric(username)) {
+    if (!isAlphaNumeric(username)) {
       document.getElementById('signup-error').innerHTML = 'username must contain only alphanumeric characters';
     } else if (password != confirm_password) {
       document.getElementById('signup-error').innerHTML = 'passwords do not match';
@@ -168,15 +158,14 @@
       $.ajax({
         url: '/signup',
         data: {
-          'email':email,
           'username':username,
-          'password':password
+          'hashed_password':SHA1(password)
         },
         type: 'POST',
         cache: false,
         success: function(response) {
           if (response.success == 'true') {
-            login_helper(username, password);
+            login_helper(username, SHA1(password));
           } else {
             document.getElementById('signup-error').innerHTML = response.error;
           }
@@ -189,24 +178,18 @@
     }
   }
 
-
-
-
   function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
-    login_helper(username, password);
+    login_helper(username, SHA1(password));
   }
 
-
-
-
-  function login_helper(username, password) {
+  function login_helper(username, hashed_password) {
     $.ajax({
       url: '/login',
       data: {
         'username':username,
-        'password':password
+        'hashed_password':hashed_password
       },
       type: 'POST',
       cache: false,
@@ -223,8 +206,6 @@
       },
     });
   }
-
-
 
   function logout() {
     $.ajax({
@@ -245,11 +226,6 @@
     });
   }
 
-
-
-
-
-
   function new_game() {
     $.ajax({
       url: '/new_game',
@@ -269,7 +245,6 @@
     });
   }
 
-
   function delete_game(code) {
     $.ajax({
       url: '/host_access/delete_game',
@@ -287,7 +262,5 @@
       },
     });
   }
-
-
 
 </script>

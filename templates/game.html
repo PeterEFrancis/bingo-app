@@ -124,7 +124,7 @@
         <div class="col-md-12">
           <h1>
             Game: {{ code }}
-            <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#shareModal">
+            <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#shareModal">
               Share <span class="glyphicon glyphicon-share"></span>
             </button>
           </h1>
@@ -285,7 +285,7 @@
             <input id="allow-join" name="allow-join" type="checkbox" onchange='set_open(this.checked ? "1" : "0")' {% if open %} checked {% endif %}/>
 
             <label for="allow-join" class="label-info"></label>
-            <p id="game-state">Game {% if open %} open {% else %} closed {% endif %}</p>
+            <p id="game-state" style="user-select: none">Game {% if open %} open {% else %} closed {% endif %}</p>
           </div>
         </div>
         <div class="col-md-8 text-right" style="margin-top: 20px;">
