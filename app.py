@@ -450,11 +450,18 @@ def play(code):
         # if game currently has player
         if get_game(code).has_player(session['player-' + code]):
             cardIDs = eval(game.players)[session['player-' + code]]
-            return render_template('cards.html', code=code, mode='player', player=session['player-' + code], num=len(cardIDs), cardHTML=get_cardHTML(cardIDs))
+            return render_template(
+                'cards.html',
+                code=code,
+                mode='player',
+                player=session['player-' + code],
+                num=len(cardIDs),
+                cardHTML=get_cardHTML(cardIDs)
+            )
         # otherwise, player was removed from game, so remove from session
         session.pop('player-' + code, None)
     # otherwise, show form to join
-    return render_template('join.html', account_bar = get_account_bar(), code = code)
+    return render_template('join.html', account_bar=get_account_bar(), code=code)
 
 
 @app.route('/admin')

@@ -15,7 +15,7 @@
     <meta http-equiv="pragma" content="no-cache"/>
 
     <title>
-      Bingo | Cards
+      Bingo | {% if mode == 'blank' %} Cards {% else %} {{player}}@{{code}} {% endif %}
     </title>
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
     <style>
@@ -36,7 +36,9 @@
 
       <div class="noprint row" style="margin-top: 5px;">
         <div class="col-md-12 text-right">
-          <button type="button" class="btn btn-info btn-xs" onclick="window.location.href='/new_cards/{{num}}'">Get New Cards</button>
+          <button type="button" class="btn btn-info btn-xs" onclick="window.location.href='/new_cards/{{num}}'">
+            Get New Cards
+          </button>
           <button class="btn btn-link" onclick="window.print();return false;">
             <span class="glyphicon glyphicon-print"></span>
           </button>
@@ -51,6 +53,7 @@
       <div class="noprint row" style="margin-top: 5px;">
         <div class="col-md-12 text-right">
           <button type="button" class="btn btn-danger btn-xs" onclick="leave_game()">Leave Game</button>
+          <button type="button" class="btn btn-warning btn-xs" onclick="window.open('/game/{{code}}', '_blank');">View Caller</button>
           <button type="button" class="btn btn-info btn-xs" onclick="location.reload(true)">Fetch Cards</button>
           <a href="/">
             <span class="glyphicon glyphicon-home"></span>
@@ -75,7 +78,7 @@
         }
       </script>
 
-      <h1>{{ player }}</h1>
+      <h1>{{ player }}<span style="color:lightgrey">@{{code}}</span></h1>
 
       {% endif %}
 
