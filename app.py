@@ -167,7 +167,7 @@ def get_user(username):
 
 
 
-@app.route('/initialize')
+# @app.route('/initialize')
 def initialize():
     db.drop_all()
     db.create_all()
@@ -351,7 +351,8 @@ def get_cardHTML(cardIDs):
 def SHA1(string):
     return hashlib.sha1(string.encode()).hexdigest()
 
-
+def get_salt(n):
+    return b64encode(urandom(n)).decode('utf-8')
 
 
 
@@ -582,7 +583,7 @@ def signup():
         return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
     if len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
         return jsonify({'success':'false','error':'A user with this username already exists.'})
-    salt = b64encode(urandom(13)).decode('utf-8')
+    salt = get_salt(13)
     db.session.add(
         User(
             request.form['username'],
