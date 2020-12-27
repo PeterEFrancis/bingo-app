@@ -568,8 +568,8 @@ def signup():
     if request.method != 'POST':
         return 'Access Denied.'
     username = request.form['username']
-    # if not username.isalnum():
-    #     return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
+    if not username.isalnum():
+        return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
     if len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
         return jsonify({'success':'false','error':'A user with this username already exists.'})
     db.session.add(
