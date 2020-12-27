@@ -130,7 +130,7 @@
 <script src="static/hash.js"></script>
 
 <script>
-  
+
   function isAlphaNumeric(str) {
     var code, i, len;
 
@@ -171,8 +171,8 @@
           }
         },
         error: function(error) {
-          document.getElementById('signup-error').innerHTML = error;
-          console.log(error);
+          document.getElementById('signup-error').innerHTML = error.statusText;
+          console.log(error.statusText);
         },
       });
     }
@@ -201,8 +201,8 @@
         }
       },
       error: function(error) {
-        document.getElementById('login-error').innerHTML = error;
-        console.log(error);
+        document.getElementById('login-error').innerHTML = error.statusText;
+        console.log(error.statusText);
       },
     });
   }
@@ -221,7 +221,7 @@
         }
       },
       error: function(error) {
-        console.log(error);
+        console.log(error.statusText);
       },
     });
   }
@@ -240,7 +240,7 @@
         }
       },
       error: function(error) {
-        console.log(error);
+        console.log(error.statusText);
       },
     });
   }
@@ -258,7 +258,7 @@
         }
       },
       error: function(error) {
-        console.log(error);
+        console.log(error.statusText);
       },
     });
   }

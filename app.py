@@ -565,21 +565,22 @@ def new_game():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    if request.method == 'POST':
-        if len(list(db.session.query(User).filter(User.email == request.form['email']))) != 0:
-            return jsonify({'success':'false','error':'A user with this email already exists.'})
-        elif len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
-            return jsonify({'success':'false','error':'A user with this username already exists.'})
-        db.session.add(
-            User(
-                request.form['email'],
-                request.form['username'],
-                request.form['hashed_password']
-            )
+    if request.method != 'POST':
+        return 'Access Denied.'
+    username = request.form['username']
+    # if not username.isalnum():
+    #     return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
+    elif len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
+        return jsonify({'success':'false','error':'A user with this username already exists.'})
+    db.session.add(
+        User(
+            request.form['email'],
+            request.form['username'],
+            request.form['hashed_password']
         )
-        db.session.commit()
-        return jsonify({'success':'true'})
-    return 'Access Denied'
+    )
+    db.session.commit()
+    return jsonify({'success':'true'})
 
 
 
