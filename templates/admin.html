@@ -69,6 +69,7 @@
           <tr>
             <th>ID</th>
             <th>username</th>
+            <th>salt</th>
             <th>hashed_password</th>
             <th>Games</th>
           </tr>
@@ -78,6 +79,7 @@
             <tr>
               <td> {{ u.id }} </td>
               <td> {{ u.username }} </td>
+              <td> {{ u.salt }} </td>
               <td> {{ u.hashed_password }} </td>
               <td> {{ u.games }} </td>
             </tr>

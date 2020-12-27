@@ -12,6 +12,11 @@ from numba import njit
 import json
 import random
 import time
+import hashlib
+from base64 import b64encode
+from os import urandom
+
+
 
 app = Flask(__name__)
 app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
@@ -125,11 +130,13 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text)
+    salt = db.Column(db.Text)
     hashed_password = db.Column(db.Text)
     games = db.Column(db.Text)
 
-    def __init__(self, username, hashed_password):
+    def __init__(self, username, salt, hashed_password):
         self.username = username
+        self.salt = salt
         self.hashed_password = hashed_password
         self.games = ''
 
@@ -160,17 +167,17 @@ def get_user(username):
 
 
 
-# @app.route('/initialize')
+@app.route('/initialize')
 def initialize():
     db.drop_all()
     db.create_all()
     users = [
-        ['a','86f7e437faa5a7fce15d1ddcb9eaeaea377667b8'],
-        ['b','e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98'],
-        ['admin','9b3217085b09efa6b051da901139f55ec18eee61']
+        ['a','7he9J08ghw9hr','f998a13487d4f1b7f273e80716fcebc02f1d69fd'],
+        ['b','9f7Jge5jr6jSRj','b09007d934e774ab5a59194b52676503a157dfbd'],
+        ['admin','Kg63KSRjsr5js','ff92bed28c618a2b17303ffefa5e40fd2e3c286e']
     ]
-    for user,hash in users:
-        db.session.add(User(user,hash))
+    for user,salt,hash in users:
+        db.session.add(User(user,salt,hash))
         db.session.commit()
     return 'done.'
 
@@ -341,7 +348,8 @@ def get_cardHTML(cardIDs):
     return cardHTML
 
 
-
+def SHA1(string):
+    return hashlib.sha1(string.encode()).hexdigest()
 
 
 
@@ -563,6 +571,8 @@ def new_game():
 
 
 
+
+
 @app.route('/signup', methods=['POST'])
 def signup():
     if request.method != 'POST':
@@ -572,10 +582,12 @@ def signup():
         return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
     if len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
         return jsonify({'success':'false','error':'A user with this username already exists.'})
+    salt = b64encode(urandom(13)).decode('utf-8')
     db.session.add(
         User(
             request.form['username'],
-            request.form['hashed_password']
+            salt,
+            SHA1(request.form['password'] + salt)
         )
     )
     db.session.commit()
@@ -588,10 +600,10 @@ def signup():
 def login():
     if request.method != 'POST':
         return 'Access Denied',403
-    users = db.session.query(User).filter(User.username == request.form['username'])
-    if len(list(users)) == 0:
+    if not is_user(request.form['username']):
         return jsonify({'success':'false','error':'No user with this username exists.'})
-    elif users[0].hashed_password != request.form['hashed_password']:
+    user = get_user(request.form['username'])
+    if user.hashed_password != SHA1(request.form['password'] + user.salt):
         return jsonify({'success':'false','error':'The entered password is incorrect.'})
     session['username'] = request.form['username']
     return jsonify({'success':'true'})

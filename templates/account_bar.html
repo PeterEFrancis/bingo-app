@@ -145,6 +145,7 @@
     return true;
   };
 
+
   function signup() {
     const username = document.getElementById('signup-username').value;
     const password = document.getElementById('signup-password').value;
@@ -159,13 +160,13 @@
         url: '/signup',
         data: {
           'username':username,
-          'hashed_password':SHA1(password)
+          'password':password
         },
         type: 'POST',
         cache: false,
         success: function(response) {
           if (response.success == 'true') {
-            login_helper(username, SHA1(password));
+            login_helper(username, password);
           } else {
             document.getElementById('signup-error').innerHTML = response.error;
           }
@@ -181,15 +182,15 @@
   function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
-    login_helper(username, SHA1(password));
+    login_helper(username, password);
   }
 
-  function login_helper(username, hashed_password) {
+  function login_helper(username, password) {
     $.ajax({
       url: '/login',
       data: {
         'username':username,
-        'hashed_password':hashed_password
+        'password':password
       },
       type: 'POST',
       cache: false,
