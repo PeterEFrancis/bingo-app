@@ -574,7 +574,6 @@ def signup():
         return jsonify({'success':'false','error':'A user with this username already exists.'})
     db.session.add(
         User(
-            request.form['email'],
             request.form['username'],
             request.form['hashed_password']
         )
