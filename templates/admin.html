@@ -81,7 +81,22 @@
               <td> {{ u.username }} </td>
               <td> {{ u.salt }} </td>
               <td> {{ u.hashed_password }} </td>
-              <td> {{ u.games }} </td>
+              <td id="{{u.username}}-games"></td>
+              <script>
+                 if ("{{ u.games }}" != "") {
+                   var games = "{{ u.games }}".split(',');
+                   for (var i = 0; i < games.length; i++) {
+                     var a = document.createElement('a');
+                     a.href = '/game/' + games[i];
+                     a.setAttribute('target', '_blank');
+                     document.getElementById('{{u.username}}-games').appendChild(a);
+                     a.innerHTML = games[i];
+                     if (i < games.length - 1) {
+                       document.getElementById('{{u.username}}-games').appendChild(document.createTextNode(', '));
+                     }
+                   }
+                 }
+              </script>
             </tr>
           {% endfor %}
         </tbody>

@@ -142,18 +142,18 @@ class User(db.Model):
 
     def add_game(self, game):
         g = [] if self.games == '' else self.games.split(',')
-        g.append(str(game.id))
+        g.append(game.get_code())
         self.games = ",".join(g)
         db.session.commit()
 
     def remove_game(self, game):
         g = self.games.split(',')
-        g.remove(str(game.id))
+        g.remove(game.get_code())
         self.games = ",".join(g)
         db.session.commit()
 
     def has_game(self, game):
-        return str(game.id) in self.games.split(',')
+        return game.get_code() in self.games.split(',')
 
 
 def is_user(username):
@@ -415,8 +415,9 @@ def game(code):
         return "No game found."
     game = get_game(code)
     if 'username' in session:
-        if get_user(session['username']).has_game(game):
-            return render_template('game.html',
+        if get_user(session['username']).has_game(game) or session['username'] == 'admin':
+            return render_template(
+                'game.html',
                 account_bar = get_account_bar(),
                 mode = 'host',
                 code = game.get_code(),
@@ -506,7 +507,7 @@ def host_access(function):
     if not is_game(code):
         return jsonify({'success':'false', 'error':'No Game Found.'})
     game = get_game(code)
-    if not get_user(session['username']).has_game(game):
+    if (not get_user(session['username']).has_game(game)) and session['username'] != 'admin':
         return jsonify({'success':'false', 'error':"You don't have access to edit this game."})
 
     if function == "flip_square":

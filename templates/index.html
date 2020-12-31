@@ -65,13 +65,13 @@
               Get
             </span>
             <input id="num" class="form-control text-center" placeholder="Number" type="string" value="1"
-                   style="font-size: 18px; line-height: 1.3333333; height: 46px" 0oninput="var s='';for(var i=0; i<this.value.length;i++){if(this.value.charCodeAt(i)>47&&this.value.charCodeAt(i)<58){s=s+this.value[i]}}this.value=s;document.getElementById('s').hidden=Number(this.value)==1;"/>
+                   style="font-size: 18px; line-height: 1.3333333; height: 46px" oninput="var s='';for(var i=0; i<this.value.length;i++){if(this.value.charCodeAt(i)>47&&this.value.charCodeAt(i)<58){s=s+this.value[i]}}this.value=s;document.getElementById('s').hidden=Number(this.value)==1;"/>
             <span class="input-group-addon" style="font-size: 18px; line-height: 1.3333333; height: 46px">
              Random Card<span id="s" hidden>s</span>
             </span>
             <span class="input-group-btn">
               <button type="button" class="btn btn-lg btn-block btn-default center-block"
-                      onclick="window.location.href='/new_cards/' + document.getElementById('num').value">
+                      onclick="window.location.href='/new_cards/' + (document.getElementById('num').value | 1)">
               <span class="glyphicon glyphicon-arrow-right"></span>
               </button>
             </span>
