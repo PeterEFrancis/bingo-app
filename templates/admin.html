@@ -16,6 +16,20 @@
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
 
   <style>
+    *[light="0"] { background-color:white; color:black}
+    *[light="1"] { background-color:grey; color:white}
+
+    .B{background-color:red; color:white}
+    .I{background-color:orange; color:white}
+    .N{background-color:green; color:white}
+    .G{background-color:blue; color:white}
+    .O{background-color:purple; color:white}
+
+    .board td {
+      padding: 0px 1px !important;
+      border: 1px solid grey;
+      font-size: 6pt;
+    }
 
   </style>
 </head>
@@ -42,7 +56,7 @@
               <th>Open</th>
               <th>Host</th>
               <th>Date</th>
-              <th>Board number</th>
+              <th>Board</th>
               <th>Last</th>
               <th>Players</th>
             </tr>
@@ -55,7 +69,18 @@
                 <td> {{ g.open }} </td>
                 <td> {{ g.host }} </td>
                 <td> {{ g.date }} </td>
-                <td> {{ g.board }} </td>
+                <td>
+                  <table class="board text-center">
+                  {% for r in [0,1,2,3,4] %}
+                    <tr>
+                      <td class="{{ 'BINGO'[r] }}">{{ 'BINGO'[r] }}</td>
+                        {% for c in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14] %}
+                          <td light="{{ g.board[r * 15 + c] }}">{{ r * 15 + c + 1 }}</td>
+                        {% endfor %}
+                    </tr>
+                  {% endfor %}
+                  </table>
+                </td>
                 <td> {{ g.last|safe }} </td>
                 <td> {{ g.players }} </td>
               </tr>
