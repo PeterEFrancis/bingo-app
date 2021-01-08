@@ -488,7 +488,7 @@ def admin(place):
 
     if place == 'access':
         return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
-    if place == 'initizlize':
+    if place == 'initialize':
         db.drop_all()
         db.create_all()
         users = [
