@@ -297,7 +297,7 @@
           </div>
           <button class="btn btn-warning" onclick="clear_cards()">Clear</button>
           <button class="btn btn-danger" onclick="remove_players()">Remove</button>
-          <button class="btn btn-success" onclick="check_for_bingo()">Check for Bingo</button>
+          <button class="btn btn-success" onclick="check_for_bingo()">Check</button>
         </div>
       </div>
       <div class="row">
@@ -307,8 +307,8 @@
               <tr>
                 <th>Player</th>
                 <th>Cards</th>
-                <th class="text-right">
-                  <label>
+                <th class="text-right" style="min-width: 125px">
+                  <label style="user-select: none">
                     Select All <input id="select-all" type="checkbox" style="margin-left: 10px;" onclick="const cbs=document.getElementsByName('player');for(var i = 0; i < cbs.length;i++){cbs[i].checked=this.checked;}"></input>
                   </label>
                 </th>
