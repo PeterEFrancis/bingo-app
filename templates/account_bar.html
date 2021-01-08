@@ -3,7 +3,8 @@
     {% if loggedin %}
       ({{username}}) <button type="button" class="btn btn-danger btn-xs" onclick="logout()">Log Out</button>
       {% if username == 'admin' %}
-      <button type="button" class="btn btn-warning btn-xs" onclick='window.location.href="/admin"'>Admin Access</button>
+      <button type="button" class="btn btn-warning btn-xs" onclick='window.location.href="/admin/access"'>Admin Access</button>
+      <button type="button" class="btn btn-info btn-xs" onclick='window.location.href="/admin/initialize"'>Initialize</button>
       {% else %}
        <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#games-modal">My Games</button>
        {% endif %}
