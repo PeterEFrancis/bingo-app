@@ -476,6 +476,18 @@ def play(code):
 
 
 
+def initialize():
+    db.drop_all()
+    db.create_all()
+    users = [
+        ['a','7he9J08ghw9hr','f998a13487d4f1b7f273e80716fcebc02f1d69fd'],
+        ['b','9f7Jge5jr6jSRj','b09007d934e774ab5a59194b52676503a157dfbd'],
+        ['admin','Kg63KSRjsr5js','ff92bed28c618a2b17303ffefa5e40fd2e3c286e']
+    ]
+    for user,salt,hash in users:
+        db.session.add(User(user,salt,hash))
+        db.session.commit()
+    return 'Initialization is done.'
 
 
 
@@ -489,17 +501,7 @@ def admin(place):
     if place == 'access':
         return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
     if place == 'initialize':
-        db.drop_all()
-        db.create_all()
-        users = [
-            ['a','7he9J08ghw9hr','f998a13487d4f1b7f273e80716fcebc02f1d69fd'],
-            ['b','9f7Jge5jr6jSRj','b09007d934e774ab5a59194b52676503a157dfbd'],
-            ['admin','Kg63KSRjsr5js','ff92bed28c618a2b17303ffefa5e40fd2e3c286e']
-        ]
-        for user,salt,hash in users:
-            db.session.add(User(user,salt,hash))
-            db.session.commit()
-        return 'Initialization is done.'
+        initialize()
 
 
 
