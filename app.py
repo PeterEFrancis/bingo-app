@@ -96,7 +96,23 @@ class Game(db.Model):
             # ... but there is about a 0% chance this will ever be executed
             newCardIDs = get_n_cards(len(players) * num_cards)
         for i, player in enumerate(players):
-            pdict[player] = newCardIDs[i * num_cards : (i + 1) * num_cards]
+            pdict[player] += newCardIDs[i * num_cards : (i + 1) * num_cards]
+        self.players = str(pdict)
+        db.session.commit()
+
+    def clear_cards(self, players):
+        pdict = eval(self.players)
+        for player in players:
+            pdict[player] = []
+        self.players = str(pdict)
+        db.session.commit()
+
+    def delete_card(self, cardID):
+        pdict = eval(self.players)
+        for player in pdict:
+            if cardID in pdict[player]:
+                pdict[player].remove(cardID)
+                break
         self.players = str(pdict)
         db.session.commit()
 
@@ -541,6 +557,12 @@ def host_access(function):
     elif function == "deal":
         game.deal(int(request.form['num_cards']), request.form['players'].split(','))
         return jsonify({'success':'true'})
+    elif function == "clear_cards":
+        game.clear_cards(request.form['players'].split(','))
+        return jsonify({'success':'true'})
+    elif function == "delete_card":
+        game.delete_card(request.form['cardID'])
+        return jsonify({'success':'true'})
     elif function == "set_open":
         game.set_open(bool(int(request.form['open'])))
         return jsonify({'success':'true', 'open':'true' if game.open else 'false'})
@@ -584,7 +606,7 @@ def signup():
         return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
     if len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
         return jsonify({'success':'false','error':'A user with this username already exists.'})
-    salt = get_salt(13)
+    salt = get_salt(12)
     db.session.add(
         User(
             request.form['username'],

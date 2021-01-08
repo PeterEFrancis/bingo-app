@@ -290,11 +290,12 @@
         </div>
         <div class="col-md-8 text-right" style="margin-top: 20px;">
           <div class="input-group" style="width: 110px; display: inline-table;">
-            <input id="num-cards" class="form-control" placeholder="Number of Cards" type="number" value="1" style="margin-bottom:-13.25px"/>
+            <input id="num-cards" class="form-control" placeholder="Number of Cards" value="1" style="margin-bottom:-13.25px"/>
             <span class="input-group-btn">
               <button type="button" class="btn btn-block btn-primary center-block" onclick="deal()">Deal</button>
             </span>
           </div>
+          <button class="btn btn-warning" onclick="clear_cards()">Clear</button>
           <button class="btn btn-danger" onclick="remove_players()">Remove</button>
           <button class="btn btn-success" onclick="check_for_bingo()">Check for Bingo</button>
         </div>
@@ -487,6 +488,22 @@
         return html;
       }
 
+      function get_popover_content(grid, cardID) {
+        return get_table(grid)
+          + "<div style='margin-top: 10px;' class='row'>"
+            + "<div class='col-xs-6'>"
+              + "<button class='btn btn-link btn-xs' onclick='delete_card(" + '"' + cardID + '"' + ")'>"
+                + "<span class='glyphicon glyphicon-trash text-danger'></span>"
+              + "</button>"
+            + "</div>"
+            + "<div class='col-xs-6 text-right'>"
+              + "<button class='btn btn-link btn-xs' onclick='window.open(" + '"/cards/' + cardID + '", ' + '"_blank")' + "'>"
+                + "<span class='glyphicon glyphicon-share text-primary'></span>"
+              + "</button>"
+            + "</div>"
+          + "</div>";
+      }
+
       function update_player_display(player_dict) {
         saved_player_dict_string = JSON.stringify(player_dict);
         document.getElementById('select-all').checked = false;
@@ -504,14 +521,15 @@
             const grid = player_dict[player][i][1];
             const badge = document.createElement('span');
             badge.classList.add('badge');
-            badge.onclick = function(){ window.open("/cards/" + cardID, '_blank')};
+            // badge.onclick = function(){ window.open("/cards/" + cardID, '_blank')};
+            badge.style.userSelect = 'none';
             badge.appendChild(document.createTextNode(cardID));
-            badge.setAttribute('id',player_dict[player][i]);
             badge.setAttribute('data-toggle','popover');
             badge.setAttribute('data-placement','top');
-            badge.setAttribute('data-trigger','hover');
+            badge.setAttribute('data-trigger','focus');
+            badge.setAttribute('tabindex','0');
             badge.setAttribute('data-html','true');
-            badge.setAttribute('data-content',get_table(grid));
+            badge.setAttribute('data-content',get_popover_content(grid, cardID));
             cards_col.appendChild(badge);
             cards_col.appendChild(document.createTextNode(" "));
           }
@@ -554,6 +572,50 @@
           }
         });
       }
+
+
+      function delete_card(cardID) {
+        $.ajax({
+          url: '/host_access/delete_card',
+          data: {
+            'cardID':cardID,
+            'code':'{{ code }}',
+          },
+          async:true,
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            update_players();
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+
+
+      function clear_cards() {
+        const cps = get_checked_players();
+        if (cps.length != 0) {
+          $.ajax({
+            url: '/host_access/clear_cards',
+            data: {
+              'code':'{{ code }}',
+              'players':cps.join(",")
+            },
+            async:true,
+            type: 'POST',
+            cache: false,
+            success: function(response) {
+              update_players();
+            },
+            error: function(error){
+              console.log(error);
+            }
+          });
+        }
+      }
+
 
       function remove_players() {
         const cps = get_checked_players();
