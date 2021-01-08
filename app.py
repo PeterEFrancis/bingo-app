@@ -183,23 +183,6 @@ def get_user(username):
 
 
 
-# @app.route('/initialize')
-def initialize():
-    db.drop_all()
-    db.create_all()
-    users = [
-        ['a','7he9J08ghw9hr','f998a13487d4f1b7f273e80716fcebc02f1d69fd'],
-        ['b','9f7Jge5jr6jSRj','b09007d934e774ab5a59194b52676503a157dfbd'],
-        ['admin','Kg63KSRjsr5js','ff92bed28c618a2b17303ffefa5e40fd2e3c286e']
-    ]
-    for user,salt,hash in users:
-        db.session.add(User(user,salt,hash))
-        db.session.commit()
-    return 'done.'
-
-
-
-
 
 #  _          _
 # | |__   ___| |_ __   ___ _ __ ___
@@ -490,15 +473,33 @@ def play(code):
     return render_template('join.html', account_bar=get_account_bar(), code=code)
 
 
-@app.route('/admin')
-def admin():
+
+
+
+
+
+
+@app.route('/admin/<string:place>')
+def admin(place):
     if not is_user('admin'):
         return redirect('/')
     if 'username' not in session or session['username'] != 'admin':
         return 'Access denied.', 403
 
-    return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
-
+    if place == 'access':
+        return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
+    if place == 'initizlize':
+        db.drop_all()
+        db.create_all()
+        users = [
+            ['a','7he9J08ghw9hr','f998a13487d4f1b7f273e80716fcebc02f1d69fd'],
+            ['b','9f7Jge5jr6jSRj','b09007d934e774ab5a59194b52676503a157dfbd'],
+            ['admin','Kg63KSRjsr5js','ff92bed28c618a2b17303ffefa5e40fd2e3c286e']
+        ]
+        for user,salt,hash in users:
+            db.session.add(User(user,salt,hash))
+            db.session.commit()
+        return 'Initialization is done.'
 
 
 
