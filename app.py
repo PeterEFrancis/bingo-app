@@ -66,7 +66,7 @@ class Game(db.Model):
             self.last = '&nbsp;'
         db.session.commit()
 
-    def clear_board(self):
+    def reset_board(self):
         self.board = '0' * 75
         self.last = '&nbsp;'
         db.session.commit()
@@ -530,8 +530,8 @@ def host_access(function):
     if function == "flip_square":
         game.flip_square(int(request.form['num']))
         return jsonify({'success':'true'})
-    elif function == "clear_board":
-        game.clear_board()
+    elif function == "reset_board":
+        game.reset_board()
         return jsonify({'success':'true'})
     elif function == "get_players":
         pdict_old = eval(game.players)

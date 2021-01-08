@@ -248,27 +248,27 @@
               Draw
           </button>
         </div>
-        <!-- clear -->
+        <!-- reset -->
         <div class="col-sm-3">
-          <button type="button" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#clearModal">
-            Clear
+          <button type="button" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#resetModal">
+            Reset
           </button>
         </div>
         <div class="col-sm-3"></div>
       </div>
 
-      <!-- clear modal -->
-      <div id="clearModal" class="modal fade" role="dialog">
+      <!-- Reset modal -->
+      <div id="resetModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Clear Confirmation</h4>
+              <h4 class="modal-title">Reset Confirmation</h4>
             </div>
             <div class="modal-body">
-              Are you sure you want to clear?
+              Are you sure you want to reset the board?
               <br><br>
-              <button type="button" class="btn btn-danger center-block" onclick="clear_board(); $('#clearModal').modal('hide')" width="50%">
+              <button type="button" class="btn btn-danger center-block" onclick="reset_board(); $('#resetModal').modal('hide')" width="50%">
                 Clear
               </button>
             </div>
@@ -438,9 +438,9 @@
         }
       }
 
-      function clear_board() {
+      function reset_board() {
         $.ajax({
-          url: '/host_access/clear_board',
+          url: '/host_access/reset_board',
           data: {'code':'{{ code }}'},
           type: 'POST',
           cache: false,
