@@ -501,7 +501,8 @@ def admin(place):
     if place == 'access':
         return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
     if place == 'initialize':
-        initialize()
+        return initialize()
+    return 'Access denied.', 403
 
 
 
@@ -709,5 +710,5 @@ def leave_game():
 
 
 if __name__ == "__main__":
-    app.debug = True
+    app.debug = False
     app.run()
