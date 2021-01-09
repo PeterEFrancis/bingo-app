@@ -153,16 +153,15 @@ class User(db.Model):
     hashed_password = db.Column(db.Text)
     games = db.Column(db.Text)
 
-    def __init__(self, username, salt, hashed_password):
+    def __init__(self, username, password):
         self.username = username
-        self.salt = salt
-        self.hashed_password = hashed_password
+        self.set_password(password)
         self.games = ''
 
     def set_password(self, password):
         self.salt = get_salt(12)
         self.hashed_password = SHA1(password + self.salt)
-
+        db.session.commit()
 
     def add_game(self, game):
         g = [] if self.games == '' else self.games.split(',')
@@ -645,16 +644,24 @@ def signup():
         return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
     if len(list(db.session.query(User).filter(User.username == request.form['username']))) != 0:
         return jsonify({'success':'false','error':'A user with this username already exists.'})
-    salt = get_salt(12)
-    db.session.add(
-        User(
-            request.form['username'],
-            salt,
-            SHA1(request.form['password'] + salt)
-        )
-    )
+    db.session.add(User(request.form['username'],request.form['password']))
     db.session.commit()
     return jsonify({'success':'true'})
+
+
+
+@app.route('/change_password', methods=['POST'])
+def change_password():
+    if request.method != 'POST':
+        return 'Access Denied.'
+    if 'username' not in session:
+        return jsonify({'success':'false', 'error':"You are not logged in."})
+    if not is_user(session['username']):
+        return jsonify({'success':'false', 'error':"You are logged into a user that no longer exists."})
+    get_user(session['username']).set_password(request.form['password'])
+    return jsonify({'success':'true'})
+
+
 
 
 
