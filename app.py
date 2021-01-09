@@ -21,8 +21,8 @@ from os import urandom
 app = Flask(__name__)
 app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/bingogames'
-# heroku = Heroku(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/bingogames'
+heroku = Heroku(app)
 
 
 
@@ -745,5 +745,5 @@ def leave_game():
 
 
 if __name__ == "__main__":
-    app.debug = True
+    app.debug = False
     app.run()
