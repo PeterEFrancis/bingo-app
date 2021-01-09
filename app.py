@@ -21,8 +21,8 @@ from os import urandom
 app = Flask(__name__)
 app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/call-bingo'
-heroku = Heroku(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/bingogames'
+# heroku = Heroku(app)
 
 
 
@@ -331,11 +331,11 @@ def get_n_cards(n):
 
 BINGO_TYPES = {
     "classic":
-        [[[r,c] for c in range(5)] for r in range(5)]
-      + [[[r,c] for r in range(5)] for c in range(5)]
-      + [[[0,0],[1,1],[2,2],[3,3],[4,4]]]
-      + [[[0,4],[1,3],[2,2],[3,1],[4,0]]],
-    "blackout": [[[r,c] for c in range(5) for r in range(5)]]
+        [[[r,c] for c in range(5) if [r,c] != [2,2]] for r in range(5)]
+      + [[[r,c] for r in range(5) if [r,c] != [2,2]] for c in range(5)]
+      + [[[0,0],[1,1],[3,3],[4,4]]]
+      + [[[0,4],[1,3],[3,1],[4,0]]],
+    "blackout": [[[r,c] for c in range(5) for r in range(5) if [r,c] != [2,2]]]
 }
 
 def check_card(cardID, board, types):
@@ -745,5 +745,5 @@ def leave_game():
 
 
 if __name__ == "__main__":
-    app.debug = False
+    app.debug = True
     app.run()
