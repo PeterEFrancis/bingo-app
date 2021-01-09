@@ -203,9 +203,6 @@
       const current_password = document.getElementById('current-password').value;
       const new_password = document.getElementById('new-password').value;
       const confirm_new_password = document.getElementById('confirm-new-password').value;
-      console.log(current_password);
-      console.log(new_password);
-      console.log(confirm_new_password);
       if (new_password != confirm_new_password) {
         document.getElementById('change-password-error').innerHTML = 'passwords do not match';
       } else {
@@ -221,11 +218,11 @@
             if (response.success == 'true') {
               location.reload(true);
             } else {
-              document.getElementById('signup-error').innerHTML = response.error;
+              document.getElementById('change-password-error').innerHTML = response.error;
             }
           },
           error: function(error) {
-            document.getElementById('signup-error').innerHTML = error.statusText;
+            document.getElementById('change-password-error').innerHTML = error.statusText;
             console.log(error.statusText);
           },
         });
