@@ -27,8 +27,15 @@
 
     .board td {
       padding: 0px 1px !important;
-      border: 1px solid grey;
+      border: 1px solid black;
       font-size: 6pt;
+    }
+
+    .badge:hover {
+      cursor: pointer;
+    }
+    .badge:focus {
+      outline: none;
     }
 
   </style>
@@ -59,6 +66,7 @@
               <th>Board</th>
               <th>Last</th>
               <th>Players</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -82,7 +90,17 @@
                   </table>
                 </td>
                 <td> {{ g.last|safe }} </td>
-                <td> {{ g.players }} </td>
+                <td id="{{ g.get_code() }}-players">
+                  {% for p in g.get_players() %}
+                    <span class="badge" data-toggle='popover' data-placement='top' data-trigger='hover' data-html='true' data-content="{% for cardID in g.get_players()[p] %}{{cardID}}{% if cardID != g.get_players()[p][-1] %},<br> {% endif %}{% endfor %}" onclick='window.open("/cards/{% for cardID in g.get_players()[p] %}{{cardID}}{% if cardID != g.get_players()[p][-1] %},{% endif %}{% endfor %}","_blank")'>{{p}}</span>
+                  {% endfor %}
+
+                </td>
+                <td style="width:1em">
+                  <a class="btn btn-link" onclick="delete_game('{{g.get_code()}}')">
+                    <span class="glyphicon glyphicon-trash text-danger"></span>
+                  </a>
+                </td>
               </tr>
             {% endfor %}
           </tbody>
@@ -97,10 +115,12 @@
               <th>salt</th>
               <th>hashed_password</th>
               <th>Games</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {% for u in all_users %}
+            {% if u.username != 'admin' %}
               <tr>
                 <td> {{ u.id }} </td>
                 <td> {{ u.username }} </td>
@@ -122,7 +142,13 @@
                      }
                    }
                 </script>
+                <td style="width:1em">
+                  <a class="btn btn-link" onclick="delete_user('{{u.username}}')">
+                    <span class="glyphicon glyphicon-trash text-danger"></span>
+                  </a>
+                </td>
               </tr>
+            {% endif %}
             {% endfor %}
           </tbody>
         </table>
@@ -140,7 +166,7 @@
   $(document).ready( function () {
     $('#master_table_games').DataTable({
       "columnDefs": [ {
-        "targets": 0,
+        "targets": [8],
         "orderable": false,
       } ],
       "order": [[ 0, 'asc' ]],
@@ -148,13 +174,47 @@
     });
     $('#master_table_users').DataTable({
       "columnDefs": [ {
-        "targets": 0,
+        "targets": 5,
         "orderable": false,
       } ],
       "order": [[ 0, 'asc' ]],
       "bPaginate":false
     });
+    $('[data-toggle="popover"]').popover();
   });
+
+
+
+  function delete_game(code) {
+    $.ajax({
+      url: '/host_access/delete_game',
+      data: {'code':code},
+      type: 'POST',
+      cache: false,
+      success: function(response) {
+        location.reload(true);
+      },
+      error: function(error) {
+        console.log(error.statusText);
+      },
+    });
+  }
+
+  function delete_user(username) {
+    $.ajax({
+      url: '/admin/delete_user',
+      data: {'username':username},
+      type: 'POST',
+      cache: false,
+      success: function(response) {
+        location.reload(true);
+      },
+      error: function(error) {
+        console.log(error.statusText);
+      },
+    });
+  }
+
 
 
 </script>

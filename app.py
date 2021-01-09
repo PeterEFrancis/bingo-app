@@ -56,6 +56,9 @@ class Game(db.Model):
         self.last = '&nbsp;'
         self.open = True
 
+    def get_players(self):
+        return eval(self.players)
+
     def flip_square(self, num):
         b = list(self.board)
         b[num - 1] = str(1 - int(b[num - 1]))
@@ -72,20 +75,20 @@ class Game(db.Model):
         db.session.commit()
 
     def add_player(self, player):
-        pdict = eval(self.players)
+        pdict = self.get_players()
         pdict[player] = []
         self.players = str(pdict)
         db.session.commit()
 
     def remove_player(self, player):
-        pdict = eval(self.players)
+        pdict = self.get_players()
         pdict.pop(player)
         self.players = str(pdict)
         db.session.commit()
 
     def deal(self, num_cards, players):
         # get new cards, and check that none of them are the same as the past cards
-        pdict = eval(self.players)
+        pdict = self.get_players()
         oldCardIDs = []
         for player in pdict:
             oldCardIDs += pdict[player]
@@ -101,14 +104,14 @@ class Game(db.Model):
         db.session.commit()
 
     def clear_cards(self, players):
-        pdict = eval(self.players)
+        pdict = self.get_players()
         for player in players:
             pdict[player] = []
         self.players = str(pdict)
         db.session.commit()
 
     def delete_card(self, cardID):
-        pdict = eval(self.players)
+        pdict = self.get_players()
         for player in pdict:
             if cardID in pdict[player]:
                 pdict[player].remove(cardID)
@@ -124,7 +127,7 @@ class Game(db.Model):
         return id_to_code(self.id)
 
     def has_player(self, player):
-        return player in eval(self.players)
+        return player in self.get_players()
 
 
 
@@ -162,9 +165,9 @@ class User(db.Model):
         self.games = ",".join(g)
         db.session.commit()
 
-    def remove_game(self, game):
+    def remove_game(self, code):
         g = self.games.split(',')
-        g.remove(game.get_code())
+        g.remove(code)
         self.games = ",".join(g)
         db.session.commit()
 
@@ -178,9 +181,20 @@ def is_user(username):
 def get_user(username):
     return db.session.query(User).filter(User.username == username)[0]
 
+def delete_game(code):
+    db.session.query(Game).filter(Game.id == code_to_id(code)).delete()
+    for user in db.session.query(User):
+        if code in user.games.split(','):
+            user.remove_game(code)
+            break
+    db.session.commit()
 
-
-
+def delete_user(username):
+    user = get_user(username)
+    for code in user.games.split(','):
+        delete_game(code)
+    db.session.query(User).filter(User.username == username).delete()
+    db.session.commit()
 
 
 
@@ -458,7 +472,7 @@ def play(code):
     if 'player-' + code in session:
         # if game currently has player
         if get_game(code).has_player(session['player-' + code]):
-            cardIDs = eval(game.players)[session['player-' + code]]
+            cardIDs = game.get_players()[session['player-' + code]]
             return render_template(
                 'cards.html',
                 code=code,
@@ -473,6 +487,14 @@ def play(code):
     return render_template('join.html', account_bar=get_account_bar(), code=code)
 
 
+
+
+
+#            _           _
+#   __ _  __| |_ __ ___ (_)_ __
+#  / _` |/ _` | '_ ` _ \| | '_ \
+# | (_| | (_| | | | | | | | | | |
+#  \__,_|\__,_|_| |_| |_|_|_| |_|
 
 
 
@@ -491,17 +513,26 @@ def initialize():
 
 
 
-@app.route('/admin/<string:place>')
-def admin(place):
+@app.route('/admin/<string:s>', methods=['POST', 'GET'])
+def admin(s):
     if not is_user('admin'):
         return redirect('/')
     if 'username' not in session or session['username'] != 'admin':
         return 'Access denied.', 403
 
-    if place == 'access':
+    if s == 'access' and request.method == 'GET':
         return render_template('admin.html', account_bar=get_account_bar(), all_games=db.session.query(Game), all_users=db.session.query(User))
-    if place == 'initialize':
-        return initialize()
+
+    if s == 'delete_user' and request.method == 'POST':
+        username = request.form['username']
+        if not is_user(username):
+            return jsonify({'success':'false', 'error':'no username exists'})
+        if username == 'admin':
+            return jsonify({'success':'false', 'error':"You can't delete the admin account."})
+        delete_user(username)
+        return jsonify({'success':'true'})
+
+
     return 'Access denied.', 403
 
 
@@ -537,7 +568,7 @@ def host_access(function):
         game.reset_board()
         return jsonify({'success':'true'})
     elif function == "get_players":
-        pdict_old = eval(game.players)
+        pdict_old = game.get_players()
         pdict = {}
         for player in pdict_old:
             pdict[player] = [[cardID, decode(cardID).tolist()] for cardID in pdict_old[player]]
@@ -548,7 +579,7 @@ def host_access(function):
         return jsonify({'success':'true'})
     elif function == "check_for_bingo":
         bingo_dict = {}
-        pdict = eval(game.players)
+        pdict = gameself.get_players()
         for p in request.form['players'].split(","):
             player_cardIDs = pdict[p]
             for cardID in player_cardIDs:
@@ -571,8 +602,7 @@ def host_access(function):
         game.set_open(bool(int(request.form['open'])))
         return jsonify({'success':'true', 'open':'true' if game.open else 'false'})
     elif function == "delete_game":
-        db.session.query(Game).filter(Game.id == code_to_id(code)).delete()
-        get_user(session['username']).remove_game(game)
+        delete_game(code)
         return jsonify({'success':'true'})
     else:
         return 'Access Denied.',403
