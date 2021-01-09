@@ -159,6 +159,11 @@ class User(db.Model):
         self.hashed_password = hashed_password
         self.games = ''
 
+    def set_password(self, password):
+        self.salt = get_salt(12)
+        self.hashed_password = SHA1(password + self.salt)
+
+
     def add_game(self, game):
         g = [] if self.games == '' else self.games.split(',')
         g.append(game.get_code())
@@ -579,7 +584,7 @@ def host_access(function):
         return jsonify({'success':'true'})
     elif function == "check_for_bingo":
         bingo_dict = {}
-        pdict = gameself.get_players()
+        pdict = game.get_players()
         for p in request.form['players'].split(","):
             player_cardIDs = pdict[p]
             for cardID in player_cardIDs:
