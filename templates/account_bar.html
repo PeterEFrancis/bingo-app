@@ -1,19 +1,42 @@
+
 <div class="row" style="margin-top: 5px;">
-  <div class="col-md-12 text-right">
+  <div class="col-xs-6">
+    <button class="btn btn-link btn-xs" onclick="window.location='/'">
+      <span class="glyphicon glyphicon-home"></span>
+    </button>
+  </div>
+  <div class="col-xs-6 text-right">
     {% if loggedin %}
-      ({{username}}) <button type="button" class="btn btn-danger btn-xs" onclick="logout()">Log Out</button>
-      {% if username == 'admin' %}
-      <button type="button" class="btn btn-warning btn-xs" onclick='window.location.href="/admin/access"'>Admin Access</button>
-      {% else %}
-       <button type="button" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#games-modal">My Games</button>
-       {% endif %}
+      <div class="dropdown">
+        <button class="btn btn-xs btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+          <span class="glyphicon glyphicon-user" style="margin-right:5px;"></span> {{username}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+          {% if username == 'admin' %}
+            <li><a href="/admin/access">Admin Access</a></li>
+            {% else %}
+            <li><a style="cursor:pointer" data-toggle="modal" data-target="#games-modal">My Games</a></li>
+          {% endif %}
+          <li class="divider"></li>
+          <li>
+            <a style="cursor:pointer" onclick="logout()">
+              <div class="row">
+                <div class="col-xs-7">
+                  Log Out
+                </div>
+                <div class="col-xs-5 text-right ">
+                  <span class="glyphicon glyphicon-log-out"></span>
+                </div>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
     {% else %}
       <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#login-modal">Log In</button>
       <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#signup-modal">Sign Up</button>
     {% endif %}
-    <button class="btn btn-link btn-xs" onclick="window.location='/'">
-      <span class="glyphicon glyphicon-home"></span>
-    </button>
+
   </div>
 </div>
 
