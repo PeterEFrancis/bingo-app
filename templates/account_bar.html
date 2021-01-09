@@ -9,7 +9,7 @@
     {% if loggedin %}
       <div class="dropdown">
         <button class="btn btn-xs btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-          <span class="glyphicon glyphicon-user" style="margin-right:5px;"></span> {{username}} <span class="caret"></span>
+          <span class="glyphicon glyphicon-user" style="margin-right:5px;"></span> {{username}} <span class="caret" style="margin-left:5px;"></span>
         </button>
         <ul class="dropdown-menu dropdown-menu-right">
           {% if username == 'admin' %}
@@ -17,6 +17,7 @@
             {% else %}
             <li><a style="cursor:pointer" data-toggle="modal" data-target="#games-modal">My Games</a></li>
           {% endif %}
+          <li><a style="cursor:pointer" data-toggle="modal" data-target="#change-password-modal">Change My Password</a></li>
           <li class="divider"></li>
           <li>
             <a style="cursor:pointer" onclick="logout()">
@@ -36,11 +37,29 @@
       <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#login-modal">Log In</button>
       <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#signup-modal">Sign Up</button>
     {% endif %}
-
   </div>
 </div>
 
+<script>
 
+  function isAlphaNumeric(str) {
+    var code, i, len;
+
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 91) && // upper alpha (A-Z)
+          !(code > 96 && code < 123)) { // lower alpha (a-z)
+        return false;
+      }
+    }
+    return true;
+  };
+
+</script>
+
+
+{% if loggedin %}
 
 {% if username != 'admin' %}
 <!-- Games Modal -->
@@ -86,6 +105,136 @@
 
 {% endif %}
 
+<!-- change password Modal -->
+<div id="change-password-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Change Password</h4>
+      </div>
+      <div class="modal-body">
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-asterisk"></span>
+          </span>
+          <input id="current-password" type="password" class="form-control" placeholder="current password"/>
+        </div>
+        <br>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-asterisk"></span>
+          </span>
+          <input id="new-password" type="password" class="form-control" placeholder="new password"/>
+        </div>
+        <div class="input-group" style="margin-top: 20px;">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-asterisk"></span>
+          </span>
+          <input id="confirm-new-password" type="password" class="form-control" placeholder="confirm new password"/>
+        </div>
+        <br>
+        <p id="change-password-error" style="color:red;">&nbsp;</p>
+        <button class="btn btn-primary center-block" onclick="change_password()">Change Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    function logout() {
+      $.ajax({
+        url: '/logout',
+        data: {},
+        type: 'POST',
+        cache: false,
+        success: function(response) {
+          if (response.success == 'true') {
+            location.reload(true);
+          } else {
+            console.log(response.error);
+          }
+        },
+        error: function(error) {
+          console.log(error.statusText);
+        },
+      });
+    }
+
+    function new_game() {
+      $.ajax({
+        url: '/new_game',
+        data: {},
+        type: 'POST',
+        cache: false,
+        success: function(response) {
+          if (response.success == 'true') {
+            window.location.href = '/game/' + response.code;
+          } else {
+            console.log(response.error);
+          }
+        },
+        error: function(error) {
+          console.log(error.statusText);
+        },
+      });
+    }
+
+    function delete_game(code) {
+      $.ajax({
+        url: '/host_access/delete_game',
+        data: {'code':code},
+        type: 'POST',
+        cache: false,
+        success: function(response) {
+          document.getElementById(code + '-row').remove();
+          if (window.location.href.endsWith(code)) {
+            window.location.href = '/';
+          }
+        },
+        error: function(error) {
+          console.log(error.statusText);
+        },
+      });
+    }
+
+    function change_password() {
+      const current_password = document.getElementById('current-password').value;
+      const new_password = document.getElementById('new-password').value;
+      const confirm_new_password = document.getElementById('confirm-new-password').value;
+      console.log(current_password);
+      console.log(new_password);
+      console.log(confirm_new_password);
+      if (new_password != confirm_new_password) {
+        document.getElementById('change-password-error').innerHTML = 'passwords do not match';
+      } else {
+        document.getElementById('change-password-error').innerHTML = '&nbsp;';
+        $.ajax({
+          url: '/change_password',
+          data: {
+            'password':new_password
+          },
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              location.reload(true);
+            } else {
+              document.getElementById('signup-error').innerHTML = response.error;
+            }
+          },
+          error: function(error) {
+            document.getElementById('signup-error').innerHTML = error.statusText;
+            console.log(error.statusText);
+          },
+        });
+      }
+    }
+
+</script>
+
+{% else %}
 
 <!-- Login Modal -->
 <div id="login-modal" class="modal fade" role="dialog">
@@ -155,21 +304,6 @@
 
 <script>
 
-  function isAlphaNumeric(str) {
-    var code, i, len;
-
-    for (i = 0, len = str.length; i < len; i++) {
-      code = str.charCodeAt(i);
-      if (!(code > 47 && code < 58) && // numeric (0-9)
-          !(code > 64 && code < 91) && // upper alpha (A-Z)
-          !(code > 96 && code < 123)) { // lower alpha (a-z)
-        return false;
-      }
-    }
-    return true;
-  };
-
-
   function signup() {
     const username = document.getElementById('signup-username').value;
     const password = document.getElementById('signup-password').value;
@@ -232,60 +366,7 @@
     });
   }
 
-  function logout() {
-    $.ajax({
-      url: '/logout',
-      data: {},
-      type: 'POST',
-      cache: false,
-      success: function(response) {
-        if (response.success == 'true') {
-          location.reload(true);
-        } else {
-          console.log(response.error);
-        }
-      },
-      error: function(error) {
-        console.log(error.statusText);
-      },
-    });
-  }
-
-  function new_game() {
-    $.ajax({
-      url: '/new_game',
-      data: {},
-      type: 'POST',
-      cache: false,
-      success: function(response) {
-        if (response.success == 'true') {
-          window.location.href = '/game/' + response.code;
-        } else {
-          console.log(response.error);
-        }
-      },
-      error: function(error) {
-        console.log(error.statusText);
-      },
-    });
-  }
-
-  function delete_game(code) {
-    $.ajax({
-      url: '/host_access/delete_game',
-      data: {'code':code},
-      type: 'POST',
-      cache: false,
-      success: function(response) {
-        document.getElementById(code + '-row').remove();
-        if (window.location.href.endsWith(code)) {
-          window.location.href = '/';
-        }
-      },
-      error: function(error) {
-        console.log(error.statusText);
-      },
-    });
-  }
-
 </script>
+
+
+{% endif %}
