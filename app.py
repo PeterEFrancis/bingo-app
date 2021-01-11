@@ -618,7 +618,6 @@ def host_access(function):
         new_cardIDs_dict = game.deal(int(request.form['num_cards']), player_list)
         player_new_cardHTML_dict = {}
         for player in player_list:
-            # print(new_cardIDs_dict[player])
             player_new_cardHTML_dict[player] = ''.join(get_cardHTML_array(new_cardIDs_dict[player]))
         socketio.emit('update players', room='game-'+code)
         socketio.emit('deal', {'players':players, 'player_new_cardHTML_dict':player_new_cardHTML_dict}, room='player-'+code)
