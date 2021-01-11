@@ -524,7 +524,7 @@
         return get_table(grid)
           + "<div style='margin-top: 10px;' class='row'>"
             + "<div class='col-xs-6'>"
-              + "<button class='btn btn-link btn-xs' onclick='delete_card(" + '"' + cardID + '"' + ',"' + player + '"' + ")'>"
+              + "<button class='btn btn-link btn-xs' onclick='console.log(1);delete_card(" + '"' + cardID + '"' + ',"' + player + '"' + ")'>"
                 + "<span class='glyphicon glyphicon-trash text-danger'></span>"
               + "</button>"
             + "</div>"
@@ -559,7 +559,7 @@
             badge.appendChild(document.createTextNode(cardID));
             badge.setAttribute('data-toggle','popover');
             badge.setAttribute('data-placement','top');
-            badge.setAttribute('data-trigger','focus');
+            badge.setAttribute('data-trigger','click');
             badge.setAttribute('tabindex','0');
             badge.setAttribute('data-html','true');
             badge.setAttribute('data-content',get_popover_content(grid, cardID, player));
