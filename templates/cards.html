@@ -15,7 +15,7 @@
     <meta http-equiv="pragma" content="no-cache"/>
 
     <title>
-      Bingo | {% if mode == 'blank' %} Cards {% else %} {{player}}@{{code}} {% endif %}
+      Bingo | Cards
     </title>
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
     <style>
@@ -30,68 +30,44 @@
 
   </head>
   <body>
-    <div class="container">
 
-      {% if mode == 'blank' %}
+
+    <div class="container-fluid">
 
       <div class="noprint row" style="margin-top: 5px;">
-        <div class="col-md-6">
+        <div class="col-xs-6">
           <button class="btn btn-xs btn-link" onclick="window.location='/'">
             <span class="glyphicon glyphicon-home"></span>
           </button>
         </div>
-        <div class="col-md-6 text-right">
-          <button type="button" class="btn btn-info btn-xs" onclick="window.location.href='/new_cards/{{num}}'">
-            Get New Cards
-          </button>
+        <div class="col-xs-6 text-right">
           <button class="btn btn-xs btn-link" onclick="window.print();return false;">
             <span class="glyphicon glyphicon-print"></span>
           </button>
-        </div>
-      </div>
-
-      {% else %}
-
-      <div class="noprint row" style="margin-top: 5px;">
-        <div class="col-md-6">
-          <button class="btn btn-xs btn-link" onclick="window.location='/'">
-            <span class="glyphicon glyphicon-home"></span>
+          <button type="button" class="btn btn-info btn-xs" onclick="window.location.href='/new_cards/{{num}}'">
+            Get New Cards
           </button>
         </div>
-        <div class="col-md-6 text-right">
-          <button type="button" class="btn btn-danger btn-xs" onclick="leave_game()">Leave Game</button>
-          <button type="button" class="btn btn-warning btn-xs" onclick="window.open('/game/{{code}}', '_blank');">View Caller</button>
-          <button type="button" class="btn btn-info btn-xs" onclick="location.reload(true)">Fetch Cards</button>
-
-        </div>
       </div>
 
-      <script>
-        function leave_game() {
-          $.ajax({
-            url: '/leave_game',
-            data: {code: '{{code}}'},
-            type: 'POST',
-            cache: false,
-            success: function(response) {
-              location.reload(true);
-            },
-            error: function(error) {
-              console.log(error);
-            },
-          });
-        }
-      </script>
-
-      <h1>{{ player }}<span style="color:lightgrey">@{{code}}</span></h1>
-
-      {% endif %}
-
-      {{ cardHTML|safe }}
-
-      <br><br><br><br><br>
-
     </div>
+
+    <div class="row">
+      <div class="col-md-12">
+
+        {% for cardHTML in cardHTML_array %}
+
+          {{ cardHTML|safe }}
+
+        {% endfor %}
+
+      </div>
+    </div>
+
+
+
+    <br><br><br><br><br>
+
 
   </body>
 

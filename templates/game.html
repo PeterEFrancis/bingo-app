@@ -110,14 +110,31 @@
         left: 20px;
       }
 
+      .player-row:hover {
+        background-color: #eee;
+        cursor: pointer;
+      }
+
+      .player-row[checked='true'] {
+        background-color: #ccc;
+      }
+
+      .player-row[checked='true']:hover {
+        background-color: #aaa;
+      }
+
+      .badge:focus {
+        outline: none;
+      }
+
     </style>
   </head>
   <body>
 
-    <div class="container">
+    {{ account_bar|safe }}
 
-      <!-- account bar -->
-      {{ account_bar|safe }}
+
+    <div class="container">
 
       <!-- Game code title -->
       <div class="row" style="margin-bottom: 30px">
@@ -183,27 +200,29 @@
         <div class="col-md-12">
           <table id="grid" style="margin:auto">
             <tr id="B-row">
-              <td><div class="square B"><h2 class="text-center">B</h2></div></td>
+              <td id="B"><div class="square B"><h2 class="text-center">B</h2></div></td>
             </tr>
             <tr id="I-row">
-              <td><div class="square I"><h2 class="text-center">I</h2></div></td>
+              <td id="I"><div class="square I"><h2 class="text-center">I</h2></div></td>
             </tr>
             <tr id="N-row">
-              <td><div class="square N"><h2 class="text-center">N</h2></div></td>
+              <td id="N"><div class="square N"><h2 class="text-center">N</h2></div></td>
             </tr>
             <tr id="G-row">
-              <td><div class="square G"><h2 class="text-center">G</h2></div></td>
+              <td id="G"><div class="square G"><h2 class="text-center">G</h2></div></td>
             </tr>
             <tr id="O-row">
-              <td><div class="square O"><h2 class="text-center">O</h2></div></td>
+              <td id="O"><div class="square O"><h2 class="text-center">O</h2></div></td>
             </tr>
           </table>
           <script>
             // build board
             const LETTERS = ["B", "I", "N", "G", "O"];
             for (var r = 0; r < LETTERS.length; r++) {
+              const letter = LETTERS[r];
               for (var i = 0; i < 15; i++) {
                 const td = document.createElement('td');
+                td.setAttribute('id',letter+"-"+i);
                 const div = document.createElement('div');
                 const h2 = document.createElement('h2');
                 const num = r * 15 + 1 + i;
@@ -309,7 +328,7 @@
                 <th>Cards</th>
                 <th class="text-right" style="min-width: 125px">
                   <label style="user-select: none">
-                    Select All <input id="select-all" type="checkbox" style="margin-left: 10px;" onclick="const cbs=document.getElementsByName('player');for(var i = 0; i < cbs.length;i++){cbs[i].checked=this.checked;}"></input>
+                    Select All <input id="select-all" type="checkbox" style="margin-left: 10px;" onclick="const cbs=document.getElementsByName('player');for(var i=0;i<cbs.length;i++){if(this.checked^cbs[i].checked){cbs[i].click();}}"></input>
                   </label>
                 </th>
               </tr>
@@ -358,7 +377,10 @@
           }
           document.getElementById(i + 1).setAttribute('light',string_board_array[i]);
         }
+
+        {% if mode == "host" %}
         document.getElementById('draw').disabled = left.length == 0;
+        {% endif %}
       }
 
       function update_board() {
@@ -488,11 +510,11 @@
         return html;
       }
 
-      function get_popover_content(grid, cardID) {
+      function get_popover_content(grid, cardID, player) {
         return get_table(grid)
           + "<div style='margin-top: 10px;' class='row'>"
             + "<div class='col-xs-6'>"
-              + "<button class='btn btn-link btn-xs' onclick='delete_card(" + '"' + cardID + '"' + ")'>"
+              + "<button class='btn btn-link btn-xs' onclick='delete_card(" + '"' + cardID + '"' + ',"' + player + '"' + ")'>"
                 + "<span class='glyphicon glyphicon-trash text-danger'></span>"
               + "</button>"
             + "</div>"
@@ -504,7 +526,7 @@
           + "</div>";
       }
 
-      function update_player_display(player_dict) {
+      function update_player_display(player_dict, cps) {
         saved_player_dict_string = JSON.stringify(player_dict);
         document.getElementById('select-all').checked = false;
         while (players.firstChild) {
@@ -512,6 +534,7 @@
         }
         for (var player in player_dict) {
           const tr = document.createElement('tr');
+          tr.classList.add('player-row');
           const player_name_col = document.createElement('td');
           const cards_col = document.createElement('td');
           const button_col = document.createElement('td');
@@ -521,7 +544,7 @@
             const grid = player_dict[player][i][1];
             const badge = document.createElement('span');
             badge.classList.add('badge');
-            // badge.onclick = function(){ window.open("/cards/" + cardID, '_blank')};
+            badge.onclick = function(){tr.click()};
             badge.style.userSelect = 'none';
             badge.appendChild(document.createTextNode(cardID));
             badge.setAttribute('data-toggle','popover');
@@ -529,7 +552,7 @@
             badge.setAttribute('data-trigger','focus');
             badge.setAttribute('tabindex','0');
             badge.setAttribute('data-html','true');
-            badge.setAttribute('data-content',get_popover_content(grid, cardID));
+            badge.setAttribute('data-content',get_popover_content(grid, cardID, player));
             cards_col.appendChild(badge);
             cards_col.appendChild(document.createTextNode(" "));
           }
@@ -537,17 +560,26 @@
           const input = document.createElement('input');
           input.name = "player";
           input.value = player;
+          input.setAttribute('id', 'player-checkbox-' + player);
+          input.onclick=function() {this.click(); tr.setAttribute('checked', this.checked)};
           input.type = "checkbox";
           button_col.appendChild(input);
           tr.appendChild(player_name_col);
           tr.appendChild(cards_col);
           tr.appendChild(button_col);
+          const p = player;
+          tr.onclick=function() {document.getElementById('player-checkbox-' + p).click()};
           players.appendChild(tr);
         }
         $('[data-toggle="popover"]').popover();
+        if (cps) {
+          for (var i = 0; i < cps.length; i++) {
+            document.getElementById('player-checkbox-' + cps[i]).click();
+          }
+        }
       }
 
-      function update_players() {
+      function update_players(cps) {
         $.ajax({
           url: '/host_access/get_players',
           data: {'code':'{{ code }}'},
@@ -561,9 +593,9 @@
               }
               if (response.board != saved_board_string) {
                 update_board_display(response.board);
-                update_player_display(response.player_dict);
+                update_player_display(response.player_dict, cps);
               } else if (saved_player_dict_string != JSON.stringify(response.player_dict)) {
-                update_player_display(response.player_dict);
+                update_player_display(response.player_dict, cps);
               }
             }
           },
@@ -573,11 +605,12 @@
         });
       }
 
-      function delete_card(cardID) {
+      function delete_card(cardID, player) {
         $.ajax({
           url: '/host_access/delete_card',
           data: {
             'cardID':cardID,
+            'player':player,
             'code':'{{ code }}',
           },
           async:true,
@@ -605,7 +638,7 @@
             type: 'POST',
             cache: false,
             success: function(response) {
-              update_players();
+              update_players(cps);
             },
             error: function(error){
               console.log(error);
@@ -649,7 +682,7 @@
             type: 'POST',
             cache: false,
             success: function(response) {
-              update_players();
+              update_players(cps);
             },
             error: function(error){
               console.log(error);

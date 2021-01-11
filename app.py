@@ -16,6 +16,8 @@ import hashlib
 from base64 import b64encode
 from os import urandom
 
+from flask_socketio import SocketIO, send, join_room, leave_room
+
 
 
 app = Flask(__name__)
@@ -23,6 +25,11 @@ app.secret_key = "ZpWNmtZBqTeLrJu6SWx6BueHGKWYxfD4fLz7CKTfcerZj4ffVhEG"
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/bingogames'
 heroku = Heroku(app)
+
+app.config['SECRET_KEY'] = 'secret!'
+
+
+socketio = SocketIO(app)
 
 
 
@@ -98,10 +105,14 @@ class Game(db.Model):
             # this is not efficient,
             # ... but there is about a 0% chance this will ever be executed
             newCardIDs = get_n_cards(len(players) * num_cards)
+        new_cardIDs_dict = {}
         for i, player in enumerate(players):
-            pdict[player] += newCardIDs[i * num_cards : (i + 1) * num_cards]
+            newPlayerCardIDs = newCardIDs[i * num_cards : (i + 1) * num_cards]
+            pdict[player] += newPlayerCardIDs
+            new_cardIDs_dict[player] = newPlayerCardIDs
         self.players = str(pdict)
         db.session.commit()
+        return new_cardIDs_dict
 
     def clear_cards(self, players):
         pdict = self.get_players()
@@ -356,13 +367,16 @@ def check_card(cardID, board, types):
     return out
 
 
-def get_cardHTML(cardIDs):
-    cardHTML = ""
+def get_cardHTML_array(cardIDs):
+    cardHTML_array = []
     for cardID in cardIDs:
+        cardHTML = f"<div id='{cardID}'>"
         cardHTML += ('<br>' * 5) + ('<br class="print">' * 5) + render_template('card.html', cardID=cardID, cardArray=decode(cardID).tolist())
         if cardID != cardIDs[-1]:
             cardHTML += '<div class="pagebreak"></div>'
-    return cardHTML
+        cardHTML += "</div>"
+        cardHTML_array.append(cardHTML)
+    return cardHTML_array
 
 
 def SHA1(string):
@@ -458,7 +472,7 @@ def cards(cardIDstrings):
         'cards.html',
         mode='blank',
         num=len(cardIDs),
-        cardHTML=get_cardHTML(cardIDs)
+        cardHTML_array=get_cardHTML_array(cardIDs)
     )
 
 
@@ -478,12 +492,12 @@ def play(code):
         if get_game(code).has_player(session['player-' + code]):
             cardIDs = game.get_players()[session['player-' + code]]
             return render_template(
-                'cards.html',
+                'play.html',
                 code=code,
                 mode='player',
                 player=session['player-' + code],
                 num=len(cardIDs),
-                cardHTML=get_cardHTML(cardIDs)
+                cardHTML_array=get_cardHTML_array(cardIDs)
             )
         # otherwise, player was removed from game, so remove from session
         session.pop('player-' + code, None)
@@ -552,8 +566,6 @@ def admin(s):
 
 @app.route('/host_access/<string:function>', methods=['POST'])
 def host_access(function):
-    if request.method != 'POST':
-        'Access Denied.',403
     if 'username' not in session:
         return jsonify({'success':'false', 'error':"You are not logged in."})
     if not is_user(session['username']):
@@ -580,6 +592,7 @@ def host_access(function):
     elif function == "remove_players":
         for p in request.form['players'].split(","):
             game.remove_player(p)
+        socketio.emit('reload', {'players':request.form['players']}, room='player-'+code)
         return jsonify({'success':'true'})
     elif function == "check_for_bingo":
         bingo_dict = {}
@@ -594,13 +607,30 @@ def host_access(function):
                     bingo_dict[p].append([cardID, check])
         return jsonify({'success':'true', 'bingo_dict': bingo_dict})
     elif function == "deal":
-        game.deal(int(request.form['num_cards']), request.form['players'].split(','))
+        players = request.form['players']
+        player_list = players.split(',')
+
+        new_cardIDs_dict = game.deal(int(request.form['num_cards']), player_list)
+
+        player_new_cardHTML_dict = {}
+        for player in player_list:
+            # print(new_cardIDs_dict[player])
+            player_new_cardHTML_dict[player] = ''.join(get_cardHTML_array(new_cardIDs_dict[player]))
+
+        socketio.emit('deal', {'players':players, 'player_new_cardHTML_dict':player_new_cardHTML_dict}, room='player-'+code)
+
         return jsonify({'success':'true'})
     elif function == "clear_cards":
         game.clear_cards(request.form['players'].split(','))
+        socketio.emit('reload', {'players':request.form['players']}, room='player-'+code)
         return jsonify({'success':'true'})
     elif function == "delete_card":
         game.delete_card(request.form['cardID'])
+        socketio.emit('delete card', {
+            'player':request.form['player'],
+            'cardID':request.form['cardID']
+        }, room='player-'+code)
+
         return jsonify({'success':'true'})
     elif function == "set_open":
         game.set_open(bool(int(request.form['open'])))
@@ -609,15 +639,13 @@ def host_access(function):
         delete_game(code)
         return jsonify({'success':'true'})
     else:
-        return 'Access Denied.',403
+        return jsonify({'success':'false', 'error':"The function you tried to access doesn't exist."})
 
 
 
 
 @app.route('/new_game', methods=['POST'])
 def new_game():
-    if request.method != 'POST':
-        return 'Access Denied.',403
     if 'username' not in session:
         return jsonify({'success':'false', 'error':"You're not logged in."})
 
@@ -637,8 +665,6 @@ def new_game():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    if request.method != 'POST':
-        return 'Access Denied.'
     username = request.form['username']
     if not username.isalnum():
         return jsonify({'success':'false','error':'Username must contain only alphanumeric characters.'})
@@ -652,8 +678,6 @@ def signup():
 
 @app.route('/change_password', methods=['POST'])
 def change_password():
-    if request.method != 'POST':
-        return 'Access Denied.'
     if 'username' not in session:
         return jsonify({'success':'false', 'error':"You are not logged in."})
     if not is_user(session['username']):
@@ -668,8 +692,6 @@ def change_password():
 
 @app.route('/login', methods=['POST'])
 def login():
-    if request.method != 'POST':
-        return 'Access Denied',403
     if not is_user(request.form['username']):
         return jsonify({'success':'false','error':'No user with this username exists.'})
     user = get_user(request.form['username'])
@@ -684,8 +706,6 @@ def login():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    if request.method != 'POST':
-        return 'Access Denied',403
     session.pop('username', None)
     return jsonify({'success':'true'})
 
@@ -697,8 +717,6 @@ def logout():
 
 @app.route('/board_access', methods=['POST'])
 def board_access():
-    if request.method != 'POST':
-        return 'Access Denied',403
     if not is_game(request.form['code']):
         return "No game found.",404
     game = get_game(request.form['code'])
@@ -713,8 +731,6 @@ def board_access():
 
 @app.route('/join_game', methods=['POST'])
 def join_game():
-    if request.method != 'POST':
-        return 'Access Denied'
     code = request.form['code']
     if not is_game(code):
         return jsonify({'success':'false', 'error':'No game found.'})
@@ -730,11 +746,18 @@ def join_game():
     return jsonify({'success':'true', 'code':code})
 
 
+@socketio.on('join game room')
+def join_game_room(data):
+    join_room('player-' + data['code'])
+
+
+
+
+
+
 
 @app.route('/leave_game', methods=['POST'])
 def leave_game():
-    if request.method != 'POST':
-        return 'Access Denied',403
     code = request.form['code']
     game = get_game(code)
     if 'player-' + code in session:
@@ -745,12 +768,28 @@ def leave_game():
     return jsonify({'success':'true'})
 
 
+@socketio.on('leave game room')
+def leave_game_room(data):
+    leave_room('player-' + data['code'])
 
 
 
+
+
+
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ' + data)
+
+
+@app.route('/test/<string:s>')
+def test(s):
+    send(s)
+    return 'sent'
 
 
 
 if __name__ == "__main__":
-    app.debug = False
-    app.run()
+    app.debug = True
+    # app.run()
+    socketio.run(app)
