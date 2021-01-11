@@ -8,6 +8,9 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta charset="utf-8">
 
+    <!-- socketIO -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+
     <!-- do not cache this page -->
     <meta http-equiv="cache-control" content="max-age=0"/>
     <meta http-equiv="cache-control" content="no-cache"/>
@@ -16,7 +19,7 @@
     <meta http-equiv="pragma" content="no-cache"/>
 
     <title>
-      Bingo | Game
+      Bingo | Game {{code}}
     </title>
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:400&display=swap" rel="stylesheet">
     <style>
@@ -298,10 +301,11 @@
       <!-- Player info -->
 
       <br><br><br>
+      <!-- controlls -->
       <div class="row">
         <div class="col-sm-4">
           <div class="material-switch">
-            <input id="allow-join" name="allow-join" type="checkbox" onchange='set_open(this.checked ? "1" : "0")' {% if open %} checked {% endif %}/>
+            <input id="allow-join" name="allow-join" type="checkbox" onclick='set_open(this.checked ? "1" : "0")'/>
 
             <label for="allow-join" class="label-info"></label>
             <p id="game-state" style="user-select: none">Game {% if open %} open {% else %} closed {% endif %}</p>
@@ -364,9 +368,6 @@
 
       var left = [];
 
-      var saved_last = '';
-      var saved_board_string = '';
-
       function update_board_display(board_string) {
         saved_board_string = board_string;
         const string_board_array = board_string.split('');
@@ -391,13 +392,8 @@
           cache: false,
           success: function(response) {
             if (response.success == 'true') {
-              if (response.last != saved_last) {
-                saved_last = response.last;
-                document.getElementById('last').innerHTML = response.last;
-              }
-              if (response.board != saved_board_string) {
-                update_board_display(response.board);
-              }
+              document.getElementById('last').innerHTML = response.last;
+              update_board_display(response.board);
             }
           },
           error: function(error){
@@ -408,16 +404,32 @@
 
     </script>
 
-    {% if mode == "player" %}
 
     <script>
+
+      var socket = io();
+
+      socket.on('connect', function() {
+        console.log('connected to socketIO');
+      });
+
+      // join room
+      socket.emit('join game board room', {code:'{{code}}'});
+
+      // reload
+      socket.on('reload', function(msg) {
+        location.reload(true);
+      });
+
       update_board();
-      setInterval(function() {
+      // changes to board
+      socket.on('update board', function(msg) {
         update_board();
-      }, 2000);
+      });
     </script>
 
-    {% else %}
+
+    {% if mode == "host" %}
 
     <!-- square handling -->
     <script>
@@ -480,8 +492,6 @@
 
     <!-- players -->
     <script>
-      var saved_player_dict_string = '';
-
       const players = document.getElementById('players');
 
       function get_checked_players(bool) {
@@ -587,16 +597,25 @@
           cache: false,
           success: function(response) {
             if (response.success == 'true') {
-              if (response.last != saved_last) {
-                saved_last = response.last;
-                document.getElementById('last').innerHTML = response.last;
-              }
-              if (response.board != saved_board_string) {
-                update_board_display(response.board);
-                update_player_display(response.player_dict, cps);
-              } else if (saved_player_dict_string != JSON.stringify(response.player_dict)) {
-                update_player_display(response.player_dict, cps);
-              }
+              update_player_display(response.player_dict, cps);
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+
+      function update_open(cps) {
+        $.ajax({
+          url: '/host_access/get_open',
+          data: {'code':'{{ code }}'},
+          type: 'POST',
+          cache: false,
+          success: function(response) {
+            if (response.success == 'true') {
+              document.getElementById('allow-join').checked = response.open;
+              document.getElementById('game-state').innerHTML = "Game " + (response.open ? "open" : "closed");
             }
           },
           error: function(error){
@@ -749,19 +768,26 @@
           async:true,
           type: 'POST',
           cache: false,
-          success: function(response) {
-            if (response.success == 'true') {
-              document.getElementById('game-state').innerHTML = "Game " + (response.open == 'true' ? "open" : "closed");
-            }
-          },
+          success: function(response) {},
           error: function(error){
             console.log(error);
           }
         });
       }
 
+
+
+      // changes to changes to open
+      update_open();
+      socket.on('update open', function(msg) {
+        update_open();
+      });
+
       update_players();
-      setInterval(update_players,2000);
+      // changes to players
+      socket.on('update players', function(msg) {
+        update_players(get_checked_players());
+      });
 
     </script>
 

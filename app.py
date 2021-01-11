@@ -577,22 +577,28 @@ def host_access(function):
     if (not get_user(session['username']).has_game(game)) and session['username'] != 'admin':
         return jsonify({'success':'false', 'error':"You don't have access to edit this game."})
 
-    if function == "flip_square":
-        game.flip_square(int(request.form['num']))
-        return jsonify({'success':'true'})
-    elif function == "reset_board":
-        game.reset_board()
-        return jsonify({'success':'true'})
-    elif function == "get_players":
+    if function == "get_players":
         pdict_old = game.get_players()
         pdict = {}
         for player in pdict_old:
             pdict[player] = [[cardID, decode(cardID).tolist()] for cardID in pdict_old[player]]
-        return jsonify({'success':'true', 'player_dict':pdict, 'board':game.board, 'last':game.last})
+        return jsonify({'success':'true', 'player_dict':pdict})
+    elif function == "get_open":
+        return jsonify({'success':'true', 'open':game.open})
+
+    elif function == "flip_square":
+        game.flip_square(int(request.form['num']))
+        socketio.emit('update board', room='game-'+code)
+        return jsonify({'success':'true'})
+    elif function == "reset_board":
+        game.reset_board()
+        socketio.emit('update board', room='game-'+code)
+        return jsonify({'success':'true'})
     elif function == "remove_players":
         for p in request.form['players'].split(","):
             game.remove_player(p)
         socketio.emit('reload', {'players':request.form['players']}, room='player-'+code)
+        socketio.emit('update players', room='game-'+code)
         return jsonify({'success':'true'})
     elif function == "check_for_bingo":
         bingo_dict = {}
@@ -609,34 +615,31 @@ def host_access(function):
     elif function == "deal":
         players = request.form['players']
         player_list = players.split(',')
-
         new_cardIDs_dict = game.deal(int(request.form['num_cards']), player_list)
-
         player_new_cardHTML_dict = {}
         for player in player_list:
             # print(new_cardIDs_dict[player])
             player_new_cardHTML_dict[player] = ''.join(get_cardHTML_array(new_cardIDs_dict[player]))
-
+        socketio.emit('update players', room='game-'+code)
         socketio.emit('deal', {'players':players, 'player_new_cardHTML_dict':player_new_cardHTML_dict}, room='player-'+code)
-
         return jsonify({'success':'true'})
     elif function == "clear_cards":
         game.clear_cards(request.form['players'].split(','))
+        socketio.emit('update players', room='game-'+code)
         socketio.emit('reload', {'players':request.form['players']}, room='player-'+code)
         return jsonify({'success':'true'})
     elif function == "delete_card":
         game.delete_card(request.form['cardID'])
-        socketio.emit('delete card', {
-            'player':request.form['player'],
-            'cardID':request.form['cardID']
-        }, room='player-'+code)
-
+        socketio.emit('update players', room='game-'+code)
+        socketio.emit('delete card', {'player':request.form['player'],'cardID':request.form['cardID']}, room='player-'+code)
         return jsonify({'success':'true'})
     elif function == "set_open":
         game.set_open(bool(int(request.form['open'])))
+        socketio.emit('update open', room='game-'+code)
         return jsonify({'success':'true', 'open':'true' if game.open else 'false'})
     elif function == "delete_game":
         delete_game(code)
+        socketio.emit('reload', room='game-'+code)
         return jsonify({'success':'true'})
     else:
         return jsonify({'success':'false', 'error':"The function you tried to access doesn't exist."})
@@ -723,6 +726,9 @@ def board_access():
     return jsonify({'success':'true', 'board':game.board, 'last':game.last})
 
 
+@socketio.on('join game board room')
+def join_game_board_room(data):
+    join_room('game-' + data['code'])
 
 
 
@@ -743,6 +749,7 @@ def join_game():
         return jsonify({'success':'false', 'error':f'You are already playing in this game with name <u>{session["player-" + code]}</u>.<br><br>Click <a href="/play/{code}">here</a> to play.'})
     session['player-' + code] = request.form['player']
     game.add_player(request.form['player'])
+    socketio.emit('update players', room='game-'+code)
     return jsonify({'success':'true', 'code':code})
 
 
@@ -765,6 +772,7 @@ def leave_game():
         if game.has_player(player):
             game.remove_player(player)
         session.pop('player-' + code, None)
+    socketio.emit('update players', room='game-'+code)
     return jsonify({'success':'true'})
 
 
@@ -776,16 +784,6 @@ def leave_game_room(data):
 
 
 
-
-@socketio.on('message')
-def handle_message(data):
-    print('received message: ' + data)
-
-
-@app.route('/test/<string:s>')
-def test(s):
-    send(s)
-    return 'sent'
 
 
 
