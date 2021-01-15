@@ -9,3 +9,4 @@ numpy
 numba
 flask_caching
 flask_socketio==4.3.2
+eventlet
