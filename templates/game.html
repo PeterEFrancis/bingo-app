@@ -122,11 +122,18 @@
       }
 
       .player-row[checked='true']:hover {
-        background-color: #aaa;
+        background-color: #bbb;
       }
 
       .badge:focus {
         outline: none;
+      }
+
+      #grid {
+        background-color: black;
+        border: 2px solid black;
+        margin: 40px auto;
+        box-shadow: 0px 0px 20px 0px black;
       }
 
     </style>
@@ -143,7 +150,7 @@
         <div class="col-md-12">
           <h1>
             Game: {{ code }}
-            <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#shareModal">
+            <button class="btn btn-info" data-toggle="modal" data-target="#shareModal">
               Share <span class="glyphicon glyphicon-share"></span>
             </button>
           </h1>
@@ -198,9 +205,9 @@
     <div class="container-fluid">
 
       <!-- Grid -->
-      <div class="row">
+      <div class="row" style="background-color: lightgrey">
         <div class="col-md-12">
-          <table id="grid" style="margin:auto">
+          <table id="grid">
             <tr id="B-row">
               <td id="B"><div class="square B"><h2 class="text-center">B</h2></div></td>
             </tr>
@@ -266,7 +273,7 @@
         <!-- draw -->
         <div class="col-sm-3">
           <button type="button" class="btn btn-default btn-lg btn-block" id="draw" onclick="draw()">
-              Draw
+              Draw (D)
           </button>
         </div>
         <!-- reset -->
@@ -312,14 +319,14 @@
         </div>
         <div class="col-md-8 text-right" style="margin-top: 20px;">
           <div class="input-group" style="width: 110px; display: inline-table;">
-            <input id="num-cards" class="form-control" placeholder="Number of Cards" value="1" style="margin-bottom:-13.25px"/>
+            <input id="num-cards" class="form-control" placeholder="Number of Cards" value="1" style="margin-bottom:-13.25px" disabled/>
             <span class="input-group-btn">
-              <button type="button" class="btn btn-block btn-primary center-block" onclick="deal()">Deal</button>
+              <button id="deal-btn" type="button" class="btn btn-block btn-primary center-block" onclick="deal()" disabled>Deal</button>
             </span>
           </div>
-          <button class="btn btn-warning" onclick="clear_cards()">Clear</button>
-          <button class="btn btn-danger" onclick="remove_players()">Remove</button>
-          <button class="btn btn-success" onclick="check_for_bingo()">Check</button>
+          <button id="clear-btn" class="btn btn-warning" onclick="clear_cards()" disabled>Clear</button>
+          <button id="remove-btn"class="btn btn-danger" onclick="remove_players()" disabled>Remove</button>
+          <button id="check-btn"class="btn btn-success" onclick="check_for_bingo()" disabled>Check</button>
         </div>
       </div>
       <div class="row">
@@ -570,7 +577,11 @@
           input.name = "player";
           input.value = player;
           input.setAttribute('id', 'player-checkbox-' + player);
-          input.onclick=function() {this.click(); tr.setAttribute('checked', this.checked)};
+          input.onclick = function() {
+            this.click();
+            tr.setAttribute('checked', this.checked);
+            check_buttons();
+          };
           input.type = "checkbox";
           button_col.appendChild(input);
           tr.appendChild(player_name_col);
@@ -585,6 +596,22 @@
           for (var i = 0; i < cps.length; i++) {
             document.getElementById('player-checkbox-' + cps[i]).click();
           }
+        }
+        check_buttons();
+      }
+
+      function check_buttons() {
+        var cps = get_checked_players();
+        document.getElementById('num-cards').disabled = cps.length == 0;
+        document.getElementById('deal-btn').disabled = cps.length == 0;
+        document.getElementById('clear-btn').disabled = cps.length == 0;
+        document.getElementById('remove-btn').disabled = cps.length == 0;
+        document.getElementById('check-btn').disabled = cps.length == 0;
+        if (cps.length == get_checked_players(true).length) {
+          document.getElementById('select-all').checked = true;
+        }
+        if (cps.length == 0) {
+          document.getElementById('select-all').checked = false;
         }
       }
 

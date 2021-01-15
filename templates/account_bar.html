@@ -1,20 +1,21 @@
-<div class = "container-fluid">
+<div class ="container-fluid">
   <div class="row" style="margin-top: 5px;">
     <div class="col-xs-6">
-      <button class="btn btn-link btn-xs" onclick="window.location='/'">
+      <button class="btn btn-link" onclick="window.location='/'">
         <span class="glyphicon glyphicon-home"></span>
       </button>
     </div>
     <div class="col-xs-6 text-right">
       {% if loggedin %}
         <div class="dropdown">
-          <button class="btn btn-xs btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
             <span class="glyphicon glyphicon-user" style="margin-right:5px;"></span> {{username}} <span class="caret" style="margin-left:5px;"></span>
           </button>
           <ul class="dropdown-menu dropdown-menu-right">
             {% if username == 'admin' %}
               <li><a href="/admin/access">Admin Access</a></li>
               {% else %}
+              <li><a style="cursor:pointer" onclick="new_game()">New Game</a></li>
               <li><a style="cursor:pointer" data-toggle="modal" data-target="#games-modal">My Games</a></li>
             {% endif %}
             <li><a style="cursor:pointer" data-toggle="modal" data-target="#change-password-modal">Change My Password</a></li>
@@ -25,7 +26,7 @@
                   <div class="col-xs-7">
                     Log Out
                   </div>
-                  <div class="col-xs-5 text-right ">
+                  <div class="col-xs-5 text-right">
                     <span class="glyphicon glyphicon-log-out"></span>
                   </div>
                 </div>
@@ -34,8 +35,8 @@
           </ul>
         </div>
       {% else %}
-        <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#login-modal">Log In</button>
-        <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#signup-modal">Sign Up</button>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#login-modal">Log In</button>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#signup-modal">Sign Up</button>
       {% endif %}
     </div>
   </div>
@@ -119,20 +120,20 @@
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-asterisk"></span>
           </span>
-          <input id="current-password" type="password" class="form-control" placeholder="current password"/>
+          <input id="current-password" type="password" class="form-control change-password" placeholder="current password"/>
         </div>
         <br>
         <div class="input-group" style="margin-top: 20px;">
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-asterisk"></span>
           </span>
-          <input id="new-password" type="password" class="form-control" placeholder="new password"/>
+          <input id="new-password" type="password" class="form-control change-password" placeholder="new password"/>
         </div>
         <div class="input-group" style="margin-top: 20px;">
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-asterisk"></span>
           </span>
-          <input id="confirm-new-password" type="password" class="form-control" placeholder="confirm new password"/>
+          <input id="confirm-new-password" type="password" class="form-control change-password" placeholder="confirm new password"/>
         </div>
         <br>
         <p id="change-password-error" style="color:red;">&nbsp;</p>
@@ -230,6 +231,12 @@
       }
     }
 
+    $(".change-password").on('keyup', function (e) {
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        change_password();
+      }
+    });
+
 </script>
 
 {% else %}
@@ -248,13 +255,13 @@
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-user"></span>
           </span>
-          <input id="login-username" class="form-control" placeholder="username"/>
+          <input id="login-username" class="form-control login" placeholder="username"/>
         </div>
         <div class="input-group" style="margin-top: 20px;">
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-asterisk"></span>
           </span>
-          <input id="login-password" type="password" class="form-control" placeholder="password"/>
+          <input id="login-password" type="password" class="form-control login" placeholder="password"/>
         </div>
         <br>
         <p id="login-error" style="color:red;">&nbsp;</p>
@@ -278,19 +285,19 @@
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-user"></span>
           </span>
-          <input id="signup-username" class="form-control" placeholder="username"/>
+          <input id="signup-username" class="form-control signup" placeholder="username"/>
         </div>
         <div class="input-group" style="margin-top: 20px;">
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-asterisk"></span>
           </span>
-          <input id="signup-password" type="password" class="form-control" placeholder="password"/>
+          <input id="signup-password" type="password" class="form-control signup" placeholder="password"/>
         </div>
         <div class="input-group" style="margin-top: 20px;">
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-asterisk"></span>
           </span>
-          <input id="signup-confirm-password" type="password" class="form-control" placeholder="confirm password"/>
+          <input id="signup-confirm-password" type="password" class="form-control signup" placeholder="confirm password"/>
         </div>
         <br>
         <p id="signup-error" style="color:red;">&nbsp;</p>
@@ -363,6 +370,19 @@
       },
     });
   }
+
+  $(".signup").on('keyup', function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      signup();
+    }
+  });
+
+  $(".login").on('keyup', function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      login();
+    }
+  });
+
 
 </script>
 
