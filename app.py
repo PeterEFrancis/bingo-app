@@ -522,10 +522,13 @@ def initialize():
     users = [
         ['a','7he9J08ghw9hr','f998a13487d4f1b7f273e80716fcebc02f1d69fd'],
         ['b','9f7Jge5jr6jSRj','b09007d934e774ab5a59194b52676503a157dfbd'],
-        ['admin','Kg63KSRjsr5js','ff92bed28c618a2b17303ffefa5e40fd2e3c286e']
+        ['admin','8G13yNDvBowbFi4g','0dc86609d94f4098f01281f2427f29c19021d916']
     ]
-    for user,salt,hash in users:
-        db.session.add(User(user,salt,hash))
+    for username, salt, hash in users:
+        u = User(username, 'blahblahblah')
+        u.salt = salt
+        u.hashed_password = hash
+        db.session.add(u)
         db.session.commit()
     return 'Initialization is done.'
 
