@@ -1,11 +1,11 @@
-Flask==1.0.2
-gunicorn==19.9.0
+Jinja2==3.1.1
+Flask==2.0.3
 flask-heroku==0.1.9
-Flask-SQLAlchemy==2.4.1
+Flask-SQLAlchemy >= 2.5.1
+Flask-Caching==2.0.1
+flask-socketio==5.3.2
 gunicorn==19.9.0
 psycopg2==2.8.3
 SQLAlchemy==1.3.8
-numpy
-flask_caching
-flask_socketio==4.3.2
-eventlet
+numpy==1.21.6
+eventlet==0.33.0
