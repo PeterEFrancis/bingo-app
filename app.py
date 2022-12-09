@@ -8,7 +8,7 @@ import os
 import sys
 import numpy as np
 import random as r
-from numba import njit
+# from numba import njit
 import json
 import random
 import time
@@ -226,7 +226,7 @@ four = np.fromfile('board_encoding/four.dat', dtype=int).reshape(32760,4)
 five = np.fromfile('board_encoding/five.dat', dtype=int).reshape(360360,5)
 
 
-@njit
+# @njit
 def base_10_to_26(n):
     digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     s = ""
@@ -246,7 +246,7 @@ def base_26_to_10(s):
     return n
 
 
-@njit
+# @njit
 def find(row):
     if len(row) == 4:
         for i in range(32760):
